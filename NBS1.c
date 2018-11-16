@@ -59,13 +59,13 @@ void on_display(void){
     // pozicije near i far clipping ravni
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, window_width/(float)window_height, 1, 25);
+    gluPerspective(60, window_width/(float)window_height, 1, 1500);
 
     //namestamo kameru gde je na sta gleda i pod kojim uglom
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(13, 13, 13,
-    	     0, 0, 0,
+    gluLookAt(15, 15, 15,
+    	     0, 1, 0,
     	     0, 1, 0);
 
 
@@ -83,6 +83,25 @@ void on_display(void){
        glVertex3f(0,0,100);
        glVertex3f(0,0,0);
     glEnd();
+
+    glColor3f(0.7, 0.7, 1);
+     
+    //pravim pod Arene(od kocke skalirane (po x i z) i malo translirane na dole) 
+    glPushMatrix();
+        glTranslatef(0, -0.5, 0);
+        glScalef(100,0,100);
+        glutSolidCube(1);
+    glPopMatrix();
+   
+    //prototip mini-bota(mozda je prototip previse jaka rec)
+    // its just a cube, but a solid cube none the less
+    glColor3f(0.4, 0.5, 1);
+    glutSolidCube(1);
+    
+    //ovo je zid napravljen od torusa 
+    glColor3f(0.3764, 0.3764, 0.3764);  
+    glRotatef(90, 1, 0, 0);
+    glutSolidTorus(40,1,10,10);
 
     // razmenjujemo sadrzaje nasa dva buffera
     glutSwapBuffers();
