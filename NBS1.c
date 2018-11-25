@@ -3,9 +3,12 @@
 #include<GL/gl.h>
 #include<GL/glu.h>
 #include<GL/glut.h>
+#include<math.h>
 
 static int window_width, window_height;
 
+//promenljive za pomeranje po x i z osi
+static int mv_Nx=0,mv_Px=0,mv_Nz=0,mv_Pz=0,mv_Py=0;
 
 //deklaracija callback funkcija
 static void on_display(void);
@@ -14,7 +17,7 @@ static void on_keyboard(unsigned char key, int x, int y);
 
 int main(int argc, char** argv){
 
-	//standardna inicijalizacija kazemo da koristimo sistem boja RGB i dva buffera
+	//standardna inicijalizacija kazemo da koristimo sistem boja RGB, dva buffera i prepoznaje se dubina 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
@@ -22,7 +25,7 @@ int main(int argc, char** argv){
     //inicijalizacija prozora
     glutInitWindowPosition(100,100);
     glutInitWindowSize(600,600);
-    glutCreateWindow("NERD-BOT-ARENA");
+    glutCreateWindow("CRINGE-BOT-ARENA");
 
     //pozivanje callback funkcija
     glutDisplayFunc(on_display);
@@ -31,6 +34,7 @@ int main(int argc, char** argv){
 
     //postavljenje boje koju zelimo da koristimo za ciscenje
     glClearColor(0,0,0,0);
+
 
     //palimo test dubine?
     glEnable(GL_DEPTH_TEST);
@@ -64,8 +68,8 @@ void on_display(void){
     //namestamo kameru gde je na sta gleda i pod kojim uglom
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(15, 15, 15,
-    	     0, 1, 0,
+    gluLookAt(10, 10, 10,
+    	     0, 0, 0,
     	     0, 1, 0);
 
 
@@ -93,11 +97,34 @@ void on_display(void){
         glutSolidCube(1);
     glPopMatrix();
    
-    //prototip mini-bota(mozda je prototip previse jaka rec)
-    // its just a cube, but a solid cube none the less
+   
     glColor3f(0.4, 0.5, 1);
-    glutSolidCube(1);
-    
+    glPushMatrix();
+    //Nacin pomeranja igraca, za sad u cetiri pravca 
+    //Nx - negativnom stranom x ose, Px pozitivnom, analogno za z
+    glTranslatef(0-mv_Nx+mv_Px, 0, 0-mv_Nz+mv_Pz);
+    //trenutni mini-bot (isprobavam oblike)
+    glBegin(GL_LINE_STRIP);
+        glVertex3f(0,0,0);                        
+        glVertex3f(0,0,1);
+        glVertex3f(1,1,1);                        
+        glVertex3f(1,1,0);
+        glVertex3f(0,0,0);
+        glVertex3f(2,0,0);
+        glVertex3f(2,0,1);
+        glVertex3f(2,1,1);
+        glVertex3f(2,1,0);
+        glVertex3f(2,0,0);
+        glVertex3f(2,0,1);
+        glVertex3f(0,0,1);
+        glVertex3f(1,1,1); 
+        glVertex3f(2,1,1); 
+        glVertex3f(2,1,0);                                                
+        glVertex3f(1,1,0);                       
+    glEnd();
+    //glutWireTorus(0.3,0.5,10,10);
+    //glutSolidCube(0.7);
+    glPopMatrix();
     //ovo je zid napravljen od torusa 
     glColor3f(0.3764, 0.3764, 0.3764);  
     glRotatef(90, 1, 0, 0);
@@ -107,6 +134,7 @@ void on_display(void){
     glutSwapBuffers();
 }
 
+			
 
 //desava se kad se prozoru promeni razmera
 static void on_reshape(int width, int height){
@@ -120,5 +148,34 @@ static void on_keyboard(unsigned char key, int x, int y){
 		case 27:
 		   exit(0);
 		   break;
+		case 'w': //Move using W-A-S-D
+		case 'W':
+			{
+			mv_Nx +=1;
+			glutPostRedisplay();
+			break;
+			}
+		case 's':
+		case 'S':
+			{
+			mv_Px +=1;
+			glutPostRedisplay();
+			break;
+			}
+		case 'a':
+		case 'A':
+			{
+			mv_Pz +=1;
+			glutPostRedisplay();
+			break;
+			}
+		case 'd':
+		case 'D':
+			{
+			mv_Nz +=1;
+			glutPostRedisplay();
+			break;
+			}
+
 	}
 }
