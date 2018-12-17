@@ -22,34 +22,34 @@ void draw_trail(int trail_ID)
 		}
 		glBegin(GL_POLYGON);
              		  glNormal3f(0,1,0);
-       				  glVertex3f(14-mv_Nx+mv_Px, 2.5, 0-mv_Nz+mv_Pz+0.25);                                               
-      				  glVertex3f(14-mv_Nx+mv_Px, 2.5, 0-mv_Nz+mv_Pz+0.75);
-       				  glVertex3f(45-mv_Nx+mv_Px, 2.5, 0-mv_Nz+mv_Pz+0.75);
-      				  glVertex3f(45-mv_Nx+mv_Px, 2.5, 0-mv_Nz+mv_Pz+0.25);
+       				  glVertex3f(24+X, 2.5, Z+0.25);                                               
+      				  glVertex3f(24+X, 2.5, Z+0.75);
+       				  glVertex3f(55+X, 2.5, Z+0.75);
+      				  glVertex3f(55+X, 2.5, Z+0.25);
    				glEnd();
 
    				glBegin(GL_POLYGON); 
    					  glNormal3f(0,1,0);
-      				  glVertex3f(16-mv_Nx+mv_Px, 1, 0-mv_Nz+mv_Pz);                                                
-      				  glVertex3f(16-mv_Nx+mv_Px, 1, 0-mv_Nz+mv_Pz+1);
-       				  glVertex3f(45-mv_Nx+mv_Px, 1, 0-mv_Nz+mv_Pz+1);
-      				  glVertex3f(45-mv_Nx+mv_Px, 1, 0-mv_Nz+mv_Pz);
+      				  glVertex3f(26+X, 1, Z);                                                
+      				  glVertex3f(26+X, 1, Z+1);
+       				  glVertex3f(55+X, 1, Z+1);
+      				  glVertex3f(55+X, 1, Z);
   				glEnd();
 
              	glBegin(GL_POLYGON);
              		  glNormal3f(0,1,-1);
-       				  glVertex3f(16-mv_Nx+mv_Px, 1, 0-mv_Nz+mv_Pz);                                                
-      				  glVertex3f(16-mv_Nx+mv_Px, 0, 0-mv_Nz+mv_Pz-1);
-       				  glVertex3f(45-mv_Nx+mv_Px, 0, 0-mv_Nz+mv_Pz-1);
-      				  glVertex3f(45-mv_Nx+mv_Px, 1, 0-mv_Nz+mv_Pz);
+       				  glVertex3f(26+X, 1, Z);                                                
+      				  glVertex3f(26+X, 0, Z-1);
+       				  glVertex3f(55+X, 0, Z-1);
+      				  glVertex3f(55+X, 1, Z);
    				glEnd();
 
    				glBegin(GL_POLYGON); 
    					  glNormal3f(0,1,1);
-      				  glVertex3f(16-mv_Nx+mv_Px, 1, 0-mv_Nz+mv_Pz+1);                                                
-      				  glVertex3f(16-mv_Nx+mv_Px, 0, 0-mv_Nz+mv_Pz+2);
-       				  glVertex3f(45-mv_Nx+mv_Px, 0, 0-mv_Nz+mv_Pz+2);
-      				  glVertex3f(45-mv_Nx+mv_Px, 1, 0-mv_Nz+mv_Pz+1);
+      				  glVertex3f(26+X, 1, Z+1);                                                
+      				  glVertex3f(26+X, 0, Z+2);
+       				  glVertex3f(55+X, 0, Z+2);
+      				  glVertex3f(55+X, 1, Z+1);
   				glEnd();
 
   			glPopMatrix();
@@ -71,34 +71,34 @@ void draw_trail(int trail_ID)
 		}
 				glBegin(GL_POLYGON);
              		  glNormal3f(0,1,0);
-       				  glVertex3f(14-mv_Nx+mv_Px+0.25, 2.5, 2-mv_Nz+mv_Pz+offset);                                               
-      				  glVertex3f(14-mv_Nx+mv_Px+0.75, 2.5, 2-mv_Nz+mv_Pz+offset);
-       				  glVertex3f(14-mv_Nx+mv_Px+0.75, 2.5, 37-mv_Nz+mv_Pz);
-      				  glVertex3f(14-mv_Nx+mv_Px+0.25, 2.5, 37-mv_Nz+mv_Pz);
+       				  glVertex3f(24+X+0.25, 2.5, 2+Z+offset);                                               
+      				  glVertex3f(24+X+0.75, 2.5, 2+Z+offset);
+       				  glVertex3f(24+X+0.75, 2.5, 3+Z);
+      				  glVertex3f(24+X+0.25, 2.5, 37+Z);
    				glEnd();
 
    				glBegin(GL_POLYGON); 
    					  glNormal3f(0,1,0);
-      				  glVertex3f(14-mv_Nx+mv_Px, 1, 2-mv_Nz+mv_Pz);                                                
-      				  glVertex3f(14-mv_Nx+mv_Px+1, 1, 2-mv_Nz+mv_Pz);
-       				  glVertex3f(14-mv_Nx+mv_Px+1, 1, 35-mv_Nz+mv_Pz);
-      				  glVertex3f(14-mv_Nx+mv_Px, 1, 35-mv_Nz+mv_Pz);
+      				  glVertex3f(24+X, 1, 2+Z);                                                
+      				  glVertex3f(24+X+1, 1, 2+Z);
+       				  glVertex3f(24+X+1, 1, 35+Z);
+      				  glVertex3f(24+X, 1, 35+Z);
   				glEnd();
 
              	glBegin(GL_POLYGON);
              		  glNormal3f(0,1,-1);
-       				  glVertex3f(14-mv_Nx+mv_Px, 1, 2-mv_Nz+mv_Pz);                                                
-      				  glVertex3f(14-mv_Nx+mv_Px-1, 0, 2-mv_Nz+mv_Pz);
-       				  glVertex3f(14-mv_Nx+mv_Px-1, 0, 35-mv_Nz+mv_Pz);
-      				  glVertex3f(14-mv_Nx+mv_Px, 1, 35-mv_Nz+mv_Pz);
+       				  glVertex3f(24+X, 1, 2+Z);                                                
+      				  glVertex3f(24+X-1, 0, 2+Z);
+       				  glVertex3f(24+X-1, 0, 35+Z);
+      				  glVertex3f(24+X, 1, 35+Z);
    				glEnd();
 
    				glBegin(GL_POLYGON); 
    					  glNormal3f(0,1,1);
-      				  glVertex3f(14-mv_Nx+mv_Px+1, 1, 2-mv_Nz+mv_Pz);                                                
-      				  glVertex3f(14-mv_Nx+mv_Px+2, 0, 2-mv_Nz+mv_Pz);
-       				  glVertex3f(14-mv_Nx+mv_Px+2, 0, 35-mv_Nz+mv_Pz);
-      				  glVertex3f(14-mv_Nx+mv_Px+1, 1, 35-mv_Nz+mv_Pz);
+      				  glVertex3f(24+X+1, 1, 2+Z);                                                
+      				  glVertex3f(24+X+2, 0, 2+Z);
+       				  glVertex3f(24+X+2, 0, 35+Z);
+      				  glVertex3f(24+X+1, 1, 35+Z);
   				glEnd();
 
   			glPopMatrix();

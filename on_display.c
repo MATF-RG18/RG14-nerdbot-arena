@@ -8,6 +8,8 @@
 #include "on_display.h"
 #include "draw_bot.h"
 #include "draw_trail.h"
+#include "draw_anunaki.h"
+#include "collision.h"
 
 void on_display(void){
 
@@ -15,10 +17,6 @@ void on_display(void){
 	//cistimo buffere boje i dubine
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //donja clipping ravan koja mi odseca donji deo Sfere koja predstavlja zid arene
-    double clip_plane0[] = {0, 1, 0, 2};
-    glClipPlane(GL_CLIP_PLANE0, clip_plane0);
-    glEnable(GL_CLIP_PLANE0);
 
     //inicijalizacija izvora svetlosti
     GLfloat light_position[] = {0, 1, 0, 0};
@@ -44,11 +42,12 @@ void on_display(void){
 
     //namestamo kameru gde je na sta gleda i pod kojim uglom, sad cak i prati igraca
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(28-mv_Nx+mv_Px, 8, 0-mv_Nz+mv_Pz,
-    	     0-mv_Nx+mv_Px, 0, 0-mv_Nz+mv_Pz,
+    glLoadIdentity(); 
+    gluLookAt(40+X, 8, Z,
+    	     X, 0, Z,
     	     0, 1, 0);
- 
+
+
     //namestamo materijal poda arene
     GLfloat ambient_coeffs[] = { 0.5, 0.5, 0.5, 1};
     GLfloat diffuse_coeffs[] = { 0.5, 0.5, 0.5, 1};
@@ -59,77 +58,93 @@ void on_display(void){
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
     glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
-
     //pod arene
     glBegin(GL_POLYGON);
         glNormal3f(0,1,0); 
-        glVertex3f(-100,-1,100);                       
-        glVertex3f(100,-1,100);
-        glVertex3f(100,-1,-100);                        
-        glVertex3f(-100,-1,-100);
+        glVertex3f(-110,-1,110);                       
+        glVertex3f(110,-1,110);
+        glVertex3f(110,-1,-110);                        
+        glVertex3f(-110,-1,-110);
     glEnd();
 
-    //materijal mini-bota
+
     GLfloat ambient_coeffs2[] = { 0.1, 0.1, 0.1, 1 };
     GLfloat diffuse_coeffs2[] = { 0.2, 0.3, 0.7, 1 };
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs2);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs2);
 
+
+     //crtam Hammer-Bot-3000
+    glPushMatrix();
+    //Nacin pomeranja igraca
+    //Nx - negativnom stranom x ose, Px pozitivnom, analogno za z
+    glTranslatef(25+X, 0, Z);
+    glRotatef(bot_rotation,0,1,0);  
+    //podestio sam se P2 sad koristimo vise c fajlova za ovaj projekat
+    draw_bot();
+            
+    glPopMatrix();
+
+
     //Crtam Anunaki
     glPushMatrix();
-    glTranslatef(0+mv_Px_A-mv_Nx_A,2+sin(mv_Px_A/4.0-mv_Nx_A/4.0)+sin(mv_Pz_A/4.0-mv_Nz_A/4.0),0+mv_Pz_A-mv_Nz_A);
-    glPushMatrix();
+    glTranslatef(-25+XA, 4+sin(XA/4.0)+sin(ZA/4.0), ZA);
+   
+    draw_anunaki();
 
-    glScalef(3,0.2,3);
-    glutSolidSphere(1,20,20);
-    glPopMatrix();
-    glutSolidSphere(1,20,20);
     glPopMatrix();
 
-    //iscrtavanje sfera pri teleportovanju i traga
+    //Anunakijeva sposobnost Mirror image
+    if(mirror_image == 1)
+    {
+        //prva kopija
+        glPushMatrix();
+        glTranslatef(-25+XA+15, 4+sin(XA/4.0)+sin(ZA/4.0), ZA-10);
+   
+        draw_anunaki();
+
+        glPopMatrix();
+
+        //druga kopija
+        glPushMatrix();
+        glTranslatef(-25+XA+15, 4+sin(XA/4.0)+sin(ZA/4.0), ZA+10);
+   
+        draw_anunaki();
+
+        glPopMatrix();
+    }
+
+     //iscrtavanje sfera pri teleportovanju i traga
     if(Teleporting == 1){
-    		
+            
             GLfloat ambient_coeffs2[] = { 0.1, 0.1, 0.1, 1 };
             GLfloat diffuse_coeffs2[] = { 0.2, 0.3, 0.7, 1 };
             glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs2);
             glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs2);
 
-            if(Zoom==1)
+            if(Zoom == 1)
             {
-           	draw_trail(trail_ID);
+            draw_trail(trail_ID);
             }
             
-            double clip_plane2[] = {0, 1, 0, TeleClp};
+            double clip_plane1[] = {0, 1, 0, TeleClp};
     
-           	glClipPlane(GL_CLIP_PLANE2, clip_plane2);
-           	glEnable(GL_CLIP_PLANE2);
+            glClipPlane(GL_CLIP_PLANE1, clip_plane1);
+            glEnable(GL_CLIP_PLANE1);
 
-           	
+            
 
 
             glPushMatrix();
-            glTranslatef(15-mv_Nx+mv_Px+1, 1.5, 0-mv_Nz+mv_Pz+0.5);
-            glutWireSphere(3, 20, 20);  
+            glTranslatef(25+X+1, 1.5, Z+0.5);
+            glutWireSphere(5, 20, 20);  
             glPopMatrix();
              
     
-            glDisable(GL_CLIP_PLANE2);
+            glDisable(GL_CLIP_PLANE1);
     }
 
 
-
-
-    //crtam Hammer-Bot-3000
-    glPushMatrix();
-    //Nacin pomeranja igraca
-    //Nx - negativnom stranom x ose, Px pozitivnom, analogno za z
-    glTranslatef(15-mv_Nx+mv_Px, 0, 0-mv_Nz+mv_Pz);
-    glRotatef(bot_rotation,0,1,0);	
-    //podestio sam se P2 sad koristimo vise c fajlova za ovaj projekat
-    draw_bot();
-  			
-    glPopMatrix();
-    
     //materijal zida arene nisam siguran da ovo radi ono sto zelim
     GLfloat ambient_coeffs_Wall[] = { 0.0, 0.0, 1.0, 1};
     GLfloat diffuse_coeffs_Wall[] = { 0.7, 0.7, 1, 1};
@@ -139,17 +154,14 @@ void on_display(void){
     glMaterialfv(GL_BACK, GL_SPECULAR, specular_coeffs_Wall);
 
     //ovo je zid napravljen od Sfere koju sece clipping ravan
-    double clip_plane1[] = {0, -1, 0, 25};
+    double clip_plane0[] = {0, -1, 0, 25};
     
-    glClipPlane(GL_CLIP_PLANE1, clip_plane1);
-    glEnable(GL_CLIP_PLANE1);
+    glClipPlane(GL_CLIP_PLANE0, clip_plane0);
+    glEnable(GL_CLIP_PLANE0);
     
-    glutSolidSphere(100, 20, 20);  
+    glutSolidSphere(105, 20, 20);  
 
     glDisable(GL_CLIP_PLANE0);
-    glDisable(GL_CLIP_PLANE1);
-
-    
 
     glPushMatrix();
 
@@ -162,25 +174,9 @@ void on_display(void){
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(28+mv_Px_A-mv_Nx_A,10,0+mv_Pz_A-mv_Nz_A,
-    	      0+mv_Px_A-mv_Nx_A,0,0+mv_Pz_A-mv_Nz_A,
-    	      0, 1, 0);
-
-    
-    glBegin(GL_LINES);
-        glColor3f(1,0,0);
-        glVertex3f(0,0,0);
-        glVertex3f(10,0,0);
-        
-        glColor3f(0,1,0);
-        glVertex3f(0,0,0);
-        glVertex3f(0,10,0);
-        
-        glColor3f(0,0,1);
-        glVertex3f(0,0,0);
-        glVertex3f(0,0,10);
-    glEnd();
-
+    gluLookAt(-40 + XA, 8, ZA,
+               XA, 0,  ZA,
+              0, 1, 0);
 
 
     //namestamo materijal poda arene
@@ -193,14 +189,13 @@ void on_display(void){
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs_D);
     glMaterialf(GL_FRONT, GL_SHININESS, shininess_D);
 
-
     //pod arene
     glBegin(GL_POLYGON);
         glNormal3f(0,1,0); 
-        glVertex3f(-100,-1,100);                       
-        glVertex3f(100,-1,100);
-        glVertex3f(100,-1,-100);                        
-        glVertex3f(-100,-1,-100);
+        glVertex3f(-110,-1,110);                       
+        glVertex3f(110,-1,110);
+        glVertex3f(110,-1,-110);                        
+        glVertex3f(-110,-1,-110);
     glEnd();
 
     //materijal mini-bota
@@ -209,63 +204,84 @@ void on_display(void){
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs2_D);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs2_D);
 
-
-    //Crtam Anunaki
-    glPushMatrix();
-    glTranslatef(0+mv_Px_A-mv_Nx_A,2+sin(mv_Px_A/4.0-mv_Nx_A/4.0)+sin(mv_Pz_A/4.0-mv_Nz_A/4.0),0+mv_Pz_A-mv_Nz_A);
-    glPushMatrix();
-
-    glScalef(3,0.2,3);
-    glutSolidSphere(1,20,20);
-    glPopMatrix();
-    glutSolidSphere(1,20,20);
-    glPopMatrix();
-
-    //iscrtavanje sfera pri teleportovanju i traga
-    if(Teleporting == 1){
-    		
-            GLfloat ambient_coeffs2_D[] = { 0.1, 0.1, 0.1, 1 };
-            GLfloat diffuse_coeffs2_D[] = { 0.2, 0.3, 0.7, 1 };
-            glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs2_D);
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs2_D);
-
-            if(Zoom==1)
-            {
-           	draw_trail(trail_ID);
-            }
-            
-            double clip_plane2_D[] = {0, 1, 0, TeleClp};
-    
-           	glClipPlane(GL_CLIP_PLANE3, clip_plane2_D);
-           	glEnable(GL_CLIP_PLANE3);
-
-           	
-
-
-            glPushMatrix();
-            glTranslatef(15-mv_Nx+mv_Px+1, 1.5, 0-mv_Nz+mv_Pz+0.5);
-            glutWireSphere(3, 20, 20);  
-            glPopMatrix();
-             
-    
-            glDisable(GL_CLIP_PLANE3);
-    }
-
     //crtam Hammer-Bot-3000
     glPushMatrix();
-    //Nacin pomeranja igraca
-    //Nx - negativnom stranom x ose, Px pozitivnom, analogno za z
-    glTranslatef(15-mv_Nx+mv_Px, 0, 0-mv_Nz+mv_Pz);
-    glRotatef(bot_rotation,0,1,0);	
-    //podestio sam se P2 sad koristimo vise c fajlova za ovaj projekat
+
+    //Nacin pomeranja HB3
+    glTranslatef(25 + X, 0, 0+Z);
+    //rotiranje bota u pravcu kretanja
+    glRotatef(bot_rotation, 0, 1, 0);  
+
+    //iscrtava se HB3
     draw_bot();
 
     glPopMatrix();
+
+    //Crtam Anunaki
+    glPushMatrix();
+    glTranslatef(-25+XA,4+sin(XA/4.0)+sin(ZA/4.0),0+ZA);
+   
+    draw_anunaki();
+
+    glPopMatrix();
+
+    //mirror image
+    if(mirror_image == 1)
+    {
+        //prva kopija
+        glPushMatrix();
+        glTranslatef(-25+XA+15, 4+sin(XA/4.0)+sin(ZA/4.0), ZA-10);
+   
+        draw_anunaki();
+
+        glPopMatrix();
+
+        //druga kopija
+        glPushMatrix();
+        glTranslatef(-25+XA+15, 4+sin(XA/4.0)+sin(ZA/4.0), ZA+10);
+   
+        draw_anunaki();
+
+        glPopMatrix();
+    }
+
+
+     //iscrtavanje sfera pri teleportovanju i traga
+    if(Teleporting == 1){
+            
+            GLfloat ambient_coeffs2[] = { 0.1, 0.1, 0.1, 1 };
+            GLfloat diffuse_coeffs2[] = { 0.2, 0.3, 0.7, 1 };
+            glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs2);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs2);
+
+            if(Zoom == 1)
+            {
+            draw_trail(trail_ID);
+            }
+            
+            double clip_plane2[] = {0, 1, 0, TeleClp};
     
+            glClipPlane(GL_CLIP_PLANE2, clip_plane2);
+            glEnable(GL_CLIP_PLANE2);
+
+            
+
+
+            glPushMatrix();
+            glTranslatef(25+X+1, 1.5, Z+0.5);
+            glutWireSphere(5, 20, 20);  
+            glPopMatrix();
+             
+    
+            glDisable(GL_CLIP_PLANE2);
+    }
+
+
     //materijal zida arene nisam siguran da ovo radi ono sto zelim
     GLfloat ambient_coeffs_Wall_D[] = { 0.0, 0.0, 1.0, 1};
     GLfloat diffuse_coeffs_Wall_D[] = { 0.7, 0.7, 1, 1};
     GLfloat specular_coeffs_Wall_D[] = { 0, 0, 0, 1};
+
     glMaterialfv(GL_BACK, GL_AMBIENT, ambient_coeffs_Wall_D);
     glMaterialfv(GL_BACK, GL_DIFFUSE, diffuse_coeffs_Wall_D);
     glMaterialfv(GL_BACK, GL_SPECULAR, specular_coeffs_Wall_D);
@@ -273,17 +289,16 @@ void on_display(void){
     //ovo je zid napravljen od Sfere koju sece clipping ravan
     double clip_plane1_D[] = {0, -1, 0, 25};
     
-    glClipPlane(GL_CLIP_PLANE4, clip_plane1_D);
-    glEnable(GL_CLIP_PLANE4);
+    glClipPlane(GL_CLIP_PLANE3, clip_plane1_D);
+    glEnable(GL_CLIP_PLANE3);
     
-    glutSolidSphere(100, 20, 20);  
+    glutSolidSphere(105, 20, 20);  
 
-    glDisable(GL_CLIP_PLANE4);
+    glDisable(GL_CLIP_PLANE3);
+
 
     glPopMatrix();
 
-    // razmenjujemo sadrzaje nasa dva buffera
-    glutSwapBuffers();
+     glutSwapBuffers();
 
-    
 }

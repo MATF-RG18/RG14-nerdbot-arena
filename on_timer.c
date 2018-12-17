@@ -6,188 +6,189 @@
 #include<math.h>
 #include<stdbool.h>
 #include "on_timer.h"
+#include "collision.h"
 
 void on_timer(int value)
 {
+        
+
+    //Ovu 'moc' mi je predlozila Sanja kad je rekla: "I onda ces da bacis Cekic?"
+    if(HTGO == 1)
+    {
+        collision(3);
+        HB3mv=0;
+        rot = 0;
+        //ako se pomeri za sto ili se priblizi kraju arene zove se funkcija za vracanje cekica
+        if(HammerThrow < -100){
+            HTB = 1;
+            HTGO = 0;
+        }
+        //kretanje cekica po x osi
+        HammerThrow -= 2;
+        
+        //promenljiva za rotiranje cekica
+        HammerSpin += 30;
+
+        //ovim pomeram cekic na dole da bi se rotirao oko centra drske
+        HammerMeme=-3.5;
+        glutPostRedisplay();
+    }
+    //sve isto ko malopre samo unazad
+    else if(HTB == 1)
+    {
+        collision(3);
+        if(HammerThrow==0)
+        {
+            //vracanje svega u normalu i izlazak iz timer_2 funkcije
+            HammerLift = 0;
+            HammerMeme = 0;
+
+            HTB = 0;
+            HTGO = 0;
+            HB3mv = 1;
+
+            glutPostRedisplay();
+
+        }
+        else
+        {
+
+        HB3mv=0;
+        rot = 0;
+        
+        HammerThrow += 2;
+
+        HammerSpin -= 30;
+
+        glutPostRedisplay();
+       }
+    }
+
     //udaranje cekica o pod 
-    if(value == 0){
-        if(HammerTime < 90){
-               
-                HammerTime+=1;
+    if(HammerUp==0)
+            {
+        if(HammerTime < 90)
+            {
+                HammerTime += 1;
                 glutPostRedisplay();
-
-                if(HammerTime == 90)
-                    glutTimerFunc(20, on_timer, 1); 
-                else
-                    glutTimerFunc(20, on_timer, 0);  
-             }
-         }
-    else if(value == 1){
-        if(HammerTime != 45){
-             HammerTime-=1;
-             glutPostRedisplay();
-             glutTimerFunc(20, on_timer, 1);
-
+            }
+        if(HammerTime == 90)
+            HammerUp = 1; 
             }
 
-        }
-    //rotiranje bota pri kretanju na razlicite strane fali kad idemo po dijagonali
-    else if(value == 4 && (keyStates[(int)'a'] || keyStates[(int)'A']))
+    else if(HammerUp == 1 && HammerTime != 45)
+            {
+                HammerTime-=1;
+                glutPostRedisplay();
+            }
+
+    //pomeranje Hammer-Bot-3000 na WASD
+    if((keyStates[(int)'w'] || keyStates[(int)'W']) || (keyStates[(int)'a'] || keyStates[(int)'A']) || (keyStates[(int)'s'] || keyStates[(int)'S']) || (keyStates[(int)'d'] || keyStates[(int)'D']))
     {
-    	if(bot_rotation==-180)
-    			bot_rotation=bot_rotation*(-1);
+        if(bot_rotation > 180)
+            bot_rotation = 180;
+        if(bot_rotation < -180)
+            bot_rotation = -180;
 
-    	if(bot_rotation<=-90)
-    		bot_rotation-=5;
-    	if(bot_rotation>90 && bot_rotation<=180)
-    		bot_rotation-=5;
-    	if(bot_rotation<90 && bot_rotation>-90)
-    		bot_rotation+=5;
-    	glutPostRedisplay();
-    	if(bot_rotation==90)
+
+        if(bot_rotation!=90 && (keyStates[(int)'a'] || keyStates[(int)'A']))
         {
-        	glutTimerFunc(20, on_timer, 3);
+            bot_rotation += rot;
         }
-        else
+        else if(bot_rotation!=-90 && (keyStates[(int)'d'] || keyStates[(int)'D']))
         {
-        glutTimerFunc(10, on_timer, 4);
-    	} 	
-    }
-    else if(value == 4 && (keyStates[(int)'d'] || keyStates[(int)'d']))
-    {
-
-
-
-    	if(bot_rotation==180)
-    			bot_rotation=bot_rotation*(-1);
-    	if(bot_rotation>=90 && bot_rotation<180)
-    		bot_rotation+=5;
-    	if(bot_rotation<-90 && bot_rotation>=-180)
-    		bot_rotation+=5;
-    	if(bot_rotation<90 && bot_rotation>0)
-    		bot_rotation-=5;
-    	if(bot_rotation>-90 && bot_rotation<=0)
-    		bot_rotation-=5;
-    	glutPostRedisplay();
+            bot_rotation += rot;
+        }
+        else if(bot_rotation!=0 && (keyStates[(int)'w'] || keyStates[(int)'W']))
+        {
+            bot_rotation += rot;
+        }
+        else if((bot_rotation!=180 && bot_rotation!=-180) && (keyStates[(int)'s'] || keyStates[(int)'S']))
+        {
+            bot_rotation += rot;
+        }
         
-    	if(bot_rotation==-90)
+       
+        if(HB3mv == 1 && !collision(1))
         {
-        	glutTimerFunc(20, on_timer, 3);
+            X += mvX;
+            Z += mvZ;
+            glutPostRedisplay();
         }
-        else
-        {
-        glutTimerFunc(10, on_timer, 4);
-    	} 
     }
-    else if(value == 4 && (keyStates[(int)'w'] || keyStates[(int)'W']))
-    {	
 
-    	if(bot_rotation>0 && bot_rotation<=180)
-    		bot_rotation-=5;	
-    	if(bot_rotation<0 && bot_rotation>=-180)
-    		bot_rotation+=5;
-    	glutPostRedisplay();
-    	if(bot_rotation==0)
+    //kretanje za Anunaki na IJKL
+        if((keyStates[(int)'k'] || keyStates[(int)'K']) || (keyStates[(int)'l'] || keyStates[(int)'L']) || (keyStates[(int)'i'] || keyStates[(int)'I']) || (keyStates[(int)'j'] || keyStates[(int)'J']))
+    {
+        if(Amv == 1 && !collision(2))
         {
-        	glutTimerFunc(20, on_timer, 3);
+            XA += mvXA;
+            ZA += mvZA;
+            glutPostRedisplay();
         }
-        else
-        {
-        glutTimerFunc(10, on_timer, 4);
-    	}
     }
-    else if(value == 4 && (keyStates[(int)'s'] || keyStates[(int)'S']))
-    {	
-    	if(bot_rotation>0 && bot_rotation<180)
-    		bot_rotation+=5;	
-    	if(bot_rotation<=0 && bot_rotation>-180)
-    		bot_rotation-=5;
-    	glutPostRedisplay();
-    	if(abs(bot_rotation)==180)
-        {
-        	glutTimerFunc(20, on_timer, 3);
+
+
+
+//Moc teleportovanja za sad u 4D
+if(Teleporting == 1){
+            if(Jump == 0){
+            if(TeleClp<-7){                
+                    if(bot_rotation==0)
+                    {
+                    trail_ID = 1;
+                    X -= 30;
+                    }
+                    else if(bot_rotation == 90)
+                    {
+                    trail_ID = 2;
+                    Z += 30;
+                    }
+                    else if(bot_rotation==-90)
+                    {
+                    trail_ID = 3;
+                    Z -= 30;
+                    }
+                    else if(bot_rotation == 180 || bot_rotation == -180)
+                    {
+                    trail_ID = 4;
+                    X += 30; 
+                    }
+                    Jump=1;
+                    glutPostRedisplay();
+            
+            }
+            else
+            {
+            TeleClp-=0.5;
+
+            glutPostRedisplay();
+            }
         }
-        else
-        {
-        glutTimerFunc(10, on_timer, 4);
-    	}
-    }
-    //kretanje za Hammer-bot-3000
-    else if(value == 3){
-    if((keyStates[(int)'w'] || keyStates[(int)'W']) && (keyStates[(int)'d'] || keyStates[(int)'D']))
-    {
+        
+         if(Jump == 1){
+            if(TeleClp>1)
+            {
+                Zoom = 0;
 
-        mv_Nz+=1;
-        mv_Nx+=1;
-        glutPostRedisplay();
-    }
-    if((keyStates[(int)'w'] || keyStates[(int)'W']) && (keyStates[(int)'a'] || keyStates[(int)'A']))
-    {
+                Teleporting = 0;
+                TeleClp = 1;
+                Jump = 0;
+                glutPostRedisplay();
+            }
+            else{
+            TeleClp+=0.5;
 
-        mv_Pz+=1;
-        mv_Nx+=1;
-        glutPostRedisplay();
-    }
-    if((keyStates[(int)'s'] || keyStates[(int)'S']) && (keyStates[(int)'d'] || keyStates[(int)'D']))
-    {
+            glutPostRedisplay();
 
-        mv_Nz+=1;
-        mv_Px+=1;
-        glutPostRedisplay();
-    }
-    if((keyStates[(int)'s'] || keyStates[(int)'S']) && (keyStates[(int)'a'] || keyStates[(int)'A']))
-    {
-
-        mv_Pz+=1;
-        mv_Px+=1;
-        glutPostRedisplay();
-    }
-    if((keyStates[(int)'w'] || keyStates[(int)'W']))
-    {
-        mv_Nx+=1;
-        glutPostRedisplay();
-    }
-    if((keyStates[(int)'a'] || keyStates[(int)'A']))
-    {	
-        mv_Pz+=1;
-        glutPostRedisplay();
-    }
-     if((keyStates[(int)'s'] || keyStates[(int)'S']))
-    {
-        mv_Px+=1;
-        glutPostRedisplay();
-    }
-    if((keyStates[(int)'d'] || keyStates[(int)'D']))
-    {
-
-        mv_Nz+=1;
-        glutPostRedisplay();
-    }
+            Zoom = 1;
+            }
         }
-    //kretanje za Anunaki
-    else if(value == 5){
-    	if((keyStates[(int)'i'] || keyStates[(int)'I']))
-    {
-        mv_Nx_A+=1;
-        glutPostRedisplay();
-    }
-    if((keyStates[(int)'j'] || keyStates[(int)'J']))
-    {	
-        mv_Pz_A+=1;
-        glutPostRedisplay();
-    }
-     if((keyStates[(int)'k'] || keyStates[(int)'K']))
-    {
-        mv_Px_A+=1;
-        glutPostRedisplay();
-    }
-    if((keyStates[(int)'l'] || keyStates[(int)'L']))
-    {
 
-        mv_Nz_A+=1;
-        glutPostRedisplay();
-    }
-    }	
-        else
-            return;
+}
+
+
+
+    glutTimerFunc(20, on_timer, 0);
+
 }
