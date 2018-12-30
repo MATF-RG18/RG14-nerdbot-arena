@@ -18,7 +18,7 @@ void draw_trail(int trail_ID)
 		glPushMatrix();
 		if(trail_ID == 4)
 		{
-		glTranslatef(-32,0,-1);
+		glTranslatef(-28,0,0);
 		}
 		glBegin(GL_POLYGON);
              		  glNormal3f(0,1,0);
@@ -63,17 +63,18 @@ void draw_trail(int trail_ID)
 	 	if(trail_ID == 3)
 		{
 		offset=-3;
+    glTranslatef(2,0,-2);
 		}
 		if(trail_ID == 2)
 		{
 		offset=0;
-		glTranslatef(1,0,-36);
+		glTranslatef(2+offset,0,-35);
 		}
 				glBegin(GL_POLYGON);
              		  glNormal3f(0,1,0);
        				  glVertex3f(24+X+0.25, 2.5, 2+Z+offset);                                               
       				  glVertex3f(24+X+0.75, 2.5, 2+Z+offset);
-       				  glVertex3f(24+X+0.75, 2.5, 3+Z);
+       				  glVertex3f(24+X+0.75, 2.5, 37+Z);
       				  glVertex3f(24+X+0.25, 2.5, 37+Z);
    				glEnd();
 

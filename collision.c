@@ -7,26 +7,38 @@
 #include<stdbool.h>
 #include "collision.h"
 
+//Hammer bot bounding box
+	int HB3Xmin;
+	int HB3Xmax;
+	int HB3Zmin;
+	int HB3Zmax;
+
+
+//Anunaki bonding box
+	int AXmin;
+	int AXmax;
+	int AZmin;
+	int AZmax;
+
 
 int collision(int IND){
 
-	//Hammer bot bounding box
-	int HB3Xmin = 26+X-3;
-	int HB3Xmax = 26+X+3;
-	int HB3Zmin = Z-1;
-	int HB3Zmax = Z+2;
+	HB3Xmin = 25+X-3;
+	HB3Xmax = 25+X+3;
+	HB3Zmin = Z-1;
+	HB3Zmax = Z+2;
 
 
-	//Anunaki bonding box
-	int AXmin = -25 + XA - 3;
-	int AXmax = -25 + XA + 3;
-	int AZmin = ZA - 3;
-	int AZmax = ZA + 3;
+	AXmin = -25 + XA - 3;
+	AXmax = -25 + XA + 3;
+	AZmin = ZA - 3;
+	AZmax = ZA + 3;
+
 
 	//colizija sa zidom arene
 
 	//za HB3
-	if(HB3Xmax*HB3Xmax + HB3Zmax*HB3Zmax - 10000 >=0)
+	if(HB3Xmax*HB3Xmax + HB3Zmax*HB3Zmax - 8400 >=0)
 	{
 		if(HB3Xmax>=0 && HB3Zmax>=0){
 	 		X -= 1;
@@ -50,7 +62,7 @@ int collision(int IND){
 	 	}
 	} 
 	//za Anunakija
-	if(AXmax*AXmax + AZmax*AZmax - 10000 >=0)
+	if(AXmax*AXmax + AZmax*AZmax - 8400 >=0)
 	{
 		if(AXmax>=0 && AZmax>=0){
 	 		XA -= 1;
@@ -74,71 +86,19 @@ int collision(int IND){
 	 	}
 	}
 
-	//sudar anunakija i HB3
 
-	//HB3 sa anunakijem
-	if(IND == 1)
+	//gledam gde se po X koordinati nalzi HB3
+	// i na tu koordinatu dodajem pola hammerThrow(ne znam zasto tako najpribliznije radi :D) i gledam da li se poklopi za X koordianatam Anunakija
+	if((X + 25 + (int)HammerThrow/2 >= AXmin && X + 25 +(int)HammerThrow/2 <= AXmax)  && (AZmin <= Z &&  Z <= AZmax))
 	{
-	if(((AXmin <= HB3Xmax &&  HB3Xmax <= AXmax) && (AZmin <= HB3Zmax &&  HB3Zmax  <= AZmax)) || ((AXmin <= HB3Xmin &&  HB3Xmin <= AXmax) && (AZmin <= HB3Zmin &&  HB3Zmin <= AZmax)))
-	{
-		if(keyStates[(int)'a'] || keyStates[(int)'A'])
-        {
-            Z -= 2;
-        }
-        else if(keyStates[(int)'d'] || keyStates[(int)'D'])
-        {
-            Z += 2;
-        }
-        else if(keyStates[(int)'w'] || keyStates[(int)'W'])
-        {
-            X += 2;
-        }
-        else if(keyStates[(int)'s'] || keyStates[(int)'S'])
-        {
-           X -= 2;
-        }
-	 	
-	}
-	}	
-	//Anunaki sa HB3
-	else if(IND == 2)
-	{
-	if(((HB3Xmin <= AXmax &&  AXmax <= HB3Xmax) && (HB3Zmin-2 <= AZmax &&  AZmax  <= HB3Zmax+2)) || ((HB3Xmin <= AXmin &&  AXmin <= HB3Xmax) && (HB3Zmin - 2 <= AZmin &&  AZmin  <= HB3Zmax + 2)))
-	{
-
-		printf("doslo je do kolizije \n");
-	
-		
-		if(keyStates[(int)'l'] || keyStates[(int)'L'])
-        {
-            ZA -= 2;
-        }
-        else if(keyStates[(int)'j'] || keyStates[(int)'J'])
-        {
-            ZA += 2;
-        }
-        else if(keyStates[(int)'k'] || keyStates[(int)'K'])
-        {
-            XA += 2;
-        }
-        else if(keyStates[(int)'i'] || keyStates[(int)'I'])
-        {
-           XA -= 2;
-        }
-	 	
-	}
+		//smanjuje se HP anunakiju ako ga strefi cekic
+		if(HITind == 1)
+		{
+		Anu_HP -= 1;
+		HITind = 0;
+		}
 	}
 
-	//kolizija cekica i anunakija
-    if(((AXmin <= (int)(HB3Xmax+HammerThrow) && (int)(HB3Xmax+HammerThrow) <= AXmax) && (AZmin+1 <= HB3Zmax + 2 &&  HB3Zmax + 2 <= AZmax+1)))
-	{
-		//TODO namesti da se nesto desi pri ovoj koliziji
-		printf("Prvi %d\n", (AXmin <= (int)(HB3Xmax+HammerThrow) && (int)(HB3Xmax+HammerThrow) <= AXmax));
-		printf("Drugi %d\n", (AZmin+1 <= HB3Zmax + 2 &&  HB3Zmax + 2 <= AZmax+1));
-		printf("Da li sam usao ovde?!\n");
-		printf("HammerThrow %lf int HammerThrow %d HB3Xmax %d\n", HammerThrow, (int)HammerThrow, HB3Xmax);
-		printf("HB3Xmax + HT %d HB3Xmin + HT %lf HB3Zmax %d HB3Zmin %d AXmax %d AXmin %d AZmax %d AZmin %d \n", (int)(HB3Xmax+HammerThrow), HB3Xmin + HammerThrow, HB3Zmax + 2, HB3Zmin + 2, AXmax, AXmin, AZmax+2, AZmin+2);
-	}
 
 	 return 0;
 }

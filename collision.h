@@ -1,7 +1,7 @@
 #ifndef _COLLISION_H_
 #define _COLLISION_H_
 
-extern int X, Z, bot_rotation, HB3mv, Amv;
+extern int X, Z, HB3_HP, Anu_HP, HITind;
 extern int XA, ZA;
 extern float HammerThrow;
 extern int keyStates[256];

@@ -10,6 +10,9 @@
 #include "on_display.h"
 #include "draw_anunaki.h"
 #include "collision.h"
+#include "image.h"
+
+
 
 //razmere prozora
 int window_width, window_height;
@@ -18,22 +21,17 @@ int window_width, window_height;
 int keyStates[256];
 
 //promenljive za pomeranje po x i z osi za HB3
-int mvX=0, X=0, mvZ=0, Z=0, bot_rotation=0, rot=0, HB3mv=0;
+int mvX=0, X=0, mvZ=0, Z=0, bot_rotation=0, rot=0, HB3mv=0, rotate = 0;
 
 //promenljive za HB3 sposobnosti
-int Teleporting=0, Jump=0, Zoom=0, trail_ID=1;
+int Teleporting=0, Jump=0, Zoom=0, trail_ID=1, HB3_HP = 10;
 float TeleClp = 1;
-
-//promenljive za pomeranje Anunakija
-int XA=0, ZA=0, mvXA=0, mvZA=0, Amv=0;
-
-//promenljive za Anunakijeve sposobosti
-int el_rotate=0, mirror_image=1;
-
 //The Hammer Is Bangin'
-float HammerTime=45, HammerThrow=0, HammerSpin=0,HammerLift=0,HammerMeme=0;
-int HammerUp=1,HTGO=0, HTB=0;
+float HammerTime=45, HammerThrow=0, HammerSpin=0, HammerLift=0, HammerMeme=0;
+int HammerUp=1, HTGO=0, HTB=0, HITind = 1;
 
+//promenljive za pomeranje Anunakija i za njegove sposobnosti
+int XA=0, ZA=0, mvXA=0, mvZA=0, Amv=0, MIter=0, setMirrors=0, el_rotate=0, mirror_image=0, AnuShoot=0, Anu_HP = 10, AnuShootMV = 0;
 
 //deklaracija callback funkcija
 static void on_reshape(int width, int height);
@@ -75,8 +73,19 @@ int main(int argc, char** argv){
     //ukljucujemo normale na objekte zbog osvetljenja
     glEnable(GL_NORMALIZE);
 
+     /* Ukljucuju se teksture. */
+    glEnable(GL_TEXTURE_2D);
+
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+    //da lepo odrazava svetlost i unutar objekata
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
+
+    //tekstura ucitana iz fajla
+   // Image * image;
+
     //malo udebljavamo crtanje linija
-    glLineWidth(3);
+    glLineWidth(1);
 
     //upadamo u glavnu petlju
     glutMainLoop();
@@ -96,7 +105,11 @@ void keyUp (unsigned char key, int x, int y) {
 static void on_keyboard(unsigned char key, int x, int y){
     //collision(1);
     keyStates[(int)key] = 1;
- 
+
+    if( mirror_image == 1 && ((int)key == 'o' || (int)key == 'O'))
+    {	
+    	return;
+ 	}
     switch(key){
         case 27:
            exit(0);
@@ -108,99 +121,113 @@ static void on_keyboard(unsigned char key, int x, int y){
         case 'a':
         case 'A':
         {
-            collision(1);
-            HB3mv=1;
-            mvX = 0;
-            mvZ = 1;
-            if(bot_rotation == 0 || bot_rotation == -90){
+          
+            rotate = 1;
+            if(bot_rotation == -180)
+            	bot_rotation = 180;
+
+            if(bot_rotation < 90 && bot_rotation >= -90){
                 rot = 5;
-                HB3mv=0;
+                mvX = 0;
+                mvZ = 0;
             }
-            else if(bot_rotation == -180){
-                bot_rotation=180;
-                rot = 0;
-                HB3mv=0;
+            else if(bot_rotation < -90 && bot_rotation >-180){
+                rot = -5;
+                mvX = 0;
+                mvZ = 0;
             }
-            else if(bot_rotation == 180)
+            else if(bot_rotation <= 180 && bot_rotation > 90)
             {
                 rot = -5;
-                HB3mv=0;  
+                mvX = 0;
+                mvZ = 0;  
             }
             else if(bot_rotation == 90){
                 rot = 0;
+                mvX = 0;
+                mvZ = 1;
+                collision(1);
             }
             break;
         }
         case 'd':
         case 'D':
         {
-            HB3mv=1;
-            collision(1);
-            mvX = 0;
-            mvZ = -1;
-            if(bot_rotation == 0 || bot_rotation == 90){
-                rot = -5;
-                HB3mv=0;
-            }
-            else if(bot_rotation == 180){
+           
+            rotate = 1;
+            if(bot_rotation == 180)
                 bot_rotation=-180;
-                rot = 0;
-                HB3mv=0;
+
+            if(bot_rotation <= 90 && bot_rotation > -90){
+                rot = -5;
+                mvX = 0;
+                mvZ = 0;
             }
-            else if(bot_rotation == -180)
+            else if(bot_rotation < -90 && bot_rotation >= -180)
             {
                 rot = 5;
-                HB3mv=0;  
+                mvX = 0;
+                mvZ = 0;  
             }
-            else if(bot_rotation == 90){
+            else if(bot_rotation > 90 && bot_rotation < 180)
+            {
+                rot = 5;
+                mvX = 0;
+                mvZ = 0;  
+            }
+            else if(bot_rotation == -90){
                 rot = 0;
+                mvX = 0;
+                mvZ = -1;
+                collision(1);
             }
             break;
         }
         case 'w':
         case 'W':
         {
-            HB3mv=1;
-            collision(1);
-            mvX = -1;
-            mvZ = 0;
-            if(bot_rotation == 180 || bot_rotation == 90){
+          
+            rotate = 1;
+            if(bot_rotation <= 180 && bot_rotation > 0)
+            {
                 rot = -5;
-                HB3mv=0;
+                mvX = 0;
+                mvZ = 0;
             }
-            else if(bot_rotation == -180){
-                bot_rotation = 180;
-                rot = 0;
-                HB3mv=0;
-            }
-            else if(bot_rotation == -90)
+            else if(bot_rotation >= -180 && bot_rotation < 0)
             {
                 rot = 5;
-                HB3mv=0;  
+                mvX = 0;
+                mvZ = 0;
             }
             else if(bot_rotation == 0){
                 rot = 0;
+                mvX = -1;
+                mvZ = 0;
+                collision(1);
             }
             break;
         }
         case 's':
         case 'S':
         {
-            HB3mv=1;
-            collision(1);
-            mvX = 1;
-            mvZ = 0;
-            if(bot_rotation == 0 || bot_rotation == -90){
-                rot = -5;
-                HB3mv=0;
-            }
-            else if(bot_rotation == 90)
-            {
+            rotate = 1;
+            if(bot_rotation >= 0 && bot_rotation < 180){
                 rot = 5;
-                HB3mv=0;  
+                mvX = 0;
+                mvZ = 0;
+            }
+            else if(bot_rotation < 0 && bot_rotation > -180)
+            {
+                rot = -5;
+                mvX = 0;
+                mvZ = 0; 
             }
             else if(bot_rotation == 180 || bot_rotation == -180){
                 rot = 0;
+                mvX = 1;
+                mvZ = 0;
+                collision(1);
             }
             break;
         }
@@ -255,6 +282,20 @@ static void on_keyboard(unsigned char key, int x, int y){
             mvXA = 0;
             mvZA = 1;
             break;
+        }
+        case 'o':
+        case 'O':
+        {
+        	mirror_image = 1;
+        	setMirrors = 1;
+        	break;
+        }
+        case 'p':
+        case 'P':
+        {
+        	AnuShoot = 1;
+            AnuShootMV = 1;
+        	break;
         }    
 
     }
