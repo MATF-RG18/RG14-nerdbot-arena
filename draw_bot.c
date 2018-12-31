@@ -84,7 +84,7 @@ void draw_bot(void){
     glScalef(0.3,0.3,0.3);
     glTranslatef(1.5+HammerThrow, 1+HammerLift, 1.75);
     glRotatef(HammerTime+HammerSpin,0,0,1); 
-    glTranslatef(0,HammerMeme,0);
+    glTranslatef(0,HammerMeme,0);   
     glutSolidSphere(1,20,20);
 
     glPushMatrix();

@@ -14,8 +14,6 @@
 #include "image.h"
 #include "endgame.h"
 
-static void draw_wall(void);
-
 int Xcopy1, Zcopy1, Ycopy1, Xcopy2, Zcopy2, Ycopy2;
 GLfloat light_position[] = {0, 1, 0, 0};
 int r;
@@ -30,30 +28,16 @@ void on_display(void){
 
 	image = image_init(0, 0);
 
-	image_read(image, "wall10.bmp");
-
-	
-
-	/* Generisu se identifikatori tekstura. */
-    glGenTextures(2, names);
-
-    glBindTexture(GL_TEXTURE_2D, names[0]);
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-                 image->width, image->height, 0,
-                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
 
     image_read(image, "Gray.bmp");
+
+    /* Generisu se identifikatori tekstura. */
+    glGenTextures(2, names);
 
     /* Iskljucujemo aktivnu teksturu */
     glBindTexture(GL_TEXTURE_2D, 0);
 
-     glBindTexture(GL_TEXTURE_2D, names[1]);
+     glBindTexture(GL_TEXTURE_2D, names[0]);
     glTexParameteri(GL_TEXTURE_2D,
                     GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D,
@@ -76,7 +60,6 @@ void on_display(void){
 
 
     //inicijalizacija izvora svetlosti
-    //GLfloat light_position[] = {0, 1, 0, 0};
     GLfloat light_ambient[] = {0.3, 0.3, 0.3, 1};
     GLfloat light_diffuse[] = {0.7, 0.7, 0.7, 1};
     GLfloat light_specular[] = {0.9, 0.9, 0.9, 1};
@@ -101,19 +84,29 @@ void on_display(void){
 
     //namestamo kameru gde je na sta gleda i pod kojim uglom, sad cak i prati igraca
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity(); 
-  	gluLookAt(40+X, 10, Z,
-  			 X+20, 0, Z,
+    glLoadIdentity();
+    //40 20 
+  	gluLookAt(40 + X, 15, Z,
+  			 X+20, 5, Z,
   			  0, 1, 0);
 
     // gluLookAt(25+X+20*cos(-bot_rotation*3.145/1100), 10, Z+20*sin(-bot_rotation*3.145/1100),
    	//      	  25+X, 0, Z,
    	//      	  0, 1, 0);
 
+  	 //namestamo materijal poda arene
+    GLfloat ambient_coeffs[] = { 0.5, 0.5, 0.5, 1};
+    GLfloat diffuse_coeffs[] = { 0.5, 0.5, 0.5, 1};
+    GLfloat specular_coeffs[] = { 0.5, 0.5, 0.5, 1};
+    GLfloat shininess = 10;
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
+    glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
     //pod arene
+    glBindTexture(GL_TEXTURE_2D, names[0]);
 
-    glBindTexture(GL_TEXTURE_2D, names[1]);
     glBegin(GL_POLYGON);
         glNormal3f(0,1,0); 
         glTexCoord2f(0, 0);
@@ -132,35 +125,12 @@ void on_display(void){
      /* Iskljucujemo aktivnu teksturu */
     glBindTexture(GL_TEXTURE_2D, 0);
 
-
     //materijali robota
     GLfloat ambient_coeffs2[] = { 0.1, 0.1, 0.1, 1 };
     GLfloat diffuse_coeffs2[] = { 0.2, 0.3, 0.5, 1 };
   //   GLfloat diffuse_coeffs2[] = { 0.9, 0.3, 0.5, 1 };
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs2);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs2);
-
-    
-
-     // Test koordinatni sistem
-
-    glBegin(GL_LINES);
-        glColor3f(1,0,0);
-        glVertex3f(0,0,0);
-        glVertex3f(100,0,0);
-        
-        glColor3f(0,1,0);
-        glVertex3f(0,0,0);
-        glVertex3f(0,100,0);
-        
-        glColor3f(0,0,1);
-        glVertex3f(0,0,0);
-        glVertex3f(0,0,100);
-    glEnd();
-
-
-
-
 
      //crtam Hammer-Bot-3000
     glPushMatrix();
@@ -174,6 +144,43 @@ void on_display(void){
     draw_bot();
             
     glPopMatrix();
+
+    //kada je pokrenura animacija za Tenken crta se Cekic
+    if(Tenken == 1)
+    {
+
+    
+    //THE HAMMER (two cubes and a sphere walk into a coordinate system...)
+    glPushMatrix();
+
+    glTranslatef(35+X, 7, Z + 10);
+    //rotiranje bota u pravcu kretanja
+    //glTranslatef(1.5,0,0.5);
+    glRotatef(bot_rotation, 0, 1, 0);
+
+    glScalef(8, 8, 8);
+    glRotatef(HammerTime,0,0,1); 
+    //glTranslatef(0,HammerMeme,0);
+    //glutSolidSphere(0.8,20,20);
+
+    glPushMatrix();
+
+    glTranslatef(0,3.5,0);
+    glScalef(1,7,1);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+    glPushMatrix();
+
+    glTranslatef(0,7,0);
+    glScalef(3,2,2);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+    glPopMatrix();
+    }
 
 
 //Anunakijeva sposobnost Mirror image
@@ -247,10 +254,8 @@ void on_display(void){
     //Crtam Anunaki
     glPushMatrix();
     glTranslatef(-25+XA, 4+sin(XA/4.0)+sin(ZA/4.0), ZA);
-    glutWireCube(6);
     draw_anunaki();
     
-
     glPopMatrix();
 
      //iscrtavanje sfera pri teleportovanju i traga
@@ -283,20 +288,18 @@ void on_display(void){
             glDisable(GL_CLIP_PLANE1);
     }
 
+    glDisable(GL_LIGHTING);
+     //ovo je zid napravljen od Sfere koju sece clipping ravan
+    double clip_plane0[] = {0, -1, 0, 30};
+    
+    glClipPlane(GL_CLIP_PLANE0, clip_plane0);
+    glEnable(GL_CLIP_PLANE0);
+    glColor3f(0.5, 0.5, 0.5);
+    glutSolidSphere(105, 20, 20);  
 
-    //materijal zida arene nisam siguran da ovo radi ono sto zelim
-    GLfloat ambient_coeffs_Wall[] = { 0.0, 0.0, 1.0, 1};
-    GLfloat diffuse_coeffs_Wall[] = { 0.5, 0.5, 1, 1};
-    GLfloat specular_coeffs_Wall[] = { 0, 0, 0, 1};
-    glMaterialfv(GL_BACK, GL_AMBIENT, ambient_coeffs_Wall);
-    glMaterialfv(GL_BACK, GL_DIFFUSE, diffuse_coeffs_Wall);
-    glMaterialfv(GL_BACK, GL_SPECULAR, specular_coeffs_Wall);
+    glDisable(GL_CLIP_PLANE0);
 
-    glBindTexture(GL_TEXTURE_2D, names[0]);
-
-    draw_wall();
-    /* Iskljucujemo aktivnu teksturu */
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glEnable(GL_LIGHTING);
 
     glPushMatrix();
 
@@ -309,31 +312,9 @@ void on_display(void){
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(-40 + XA, 10, ZA,
-               XA-20, 0,  ZA,
+    gluLookAt(-40 + XA, 15, ZA,
+               XA-20, 5,  ZA,
               0, 1, 0);
-
-
-     // Test koordinatni sistem
-    glPushMatrix();
-   // glTranslatef(25+X, 0, Z);
-
-    glBegin(GL_LINES);
-        glColor3f(1,0,0);
-        glVertex3f(0,0,0);
-        glVertex3f(100,0,0);
-        
-        glColor3f(0,1,0);
-        glVertex3f(0,0,0);
-        glVertex3f(0,100,0);
-        
-        glColor3f(0,0,1);
-        glVertex3f(0,0,0);
-        glVertex3f(0,0,100);
-    glEnd();
-
-
-    glPopMatrix();
 
 
     //namestamo materijal poda arene
@@ -348,7 +329,7 @@ void on_display(void){
 
       //pod arene
 
-    glBindTexture(GL_TEXTURE_2D, names[1]);
+    glBindTexture(GL_TEXTURE_2D, names[0]);
     glBegin(GL_POLYGON);
          glNormal3f(0,1,0); 
         glTexCoord2f(0, 0);
@@ -377,7 +358,7 @@ void on_display(void){
     glPushMatrix();
 
     //Nacin pomeranja HB3
-    glTranslatef(25 + X, 0, 0+Z);
+    glTranslatef(25 + X, 0, Z);
     //rotiranje bota u pravcu kretanja
     glTranslatef(1.5,0,0.5);
     glRotatef(bot_rotation,0,1,0);
@@ -387,6 +368,41 @@ void on_display(void){
     draw_bot();
 
     glPopMatrix();
+
+    if(Tenken == 1)
+    {
+
+  	//THE HAMMER (two cubes and a sphere walk into a coordinate system...)
+    glPushMatrix();
+
+    glTranslatef(35+X, 7, Z + 10);
+    //rotiranje bota u pravcu kretanja
+    //glTranslatef(1.5,0,0.5);
+    glRotatef(bot_rotation, 0, 1, 0);
+
+    glScalef(8, 8, 8);
+    glRotatef(HammerTime,0,0,1); 
+    //glTranslatef(0,HammerMeme,0);
+    glutSolidSphere(0.8,20,20);
+
+    glPushMatrix();
+
+    glTranslatef(0,3.5,0);
+    glScalef(1,7,1);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+    glPushMatrix();
+
+    glTranslatef(0,7,0);
+    glScalef(3,2,2);
+    glutSolidCube(1);
+
+    glPopMatrix();
+
+    glPopMatrix();
+    }
 
 
     //Crtam Anunaki
@@ -428,22 +444,21 @@ void on_display(void){
     }
 
 
-    //materijal zida arene
-    GLfloat ambient_coeffs_Wall_D[] = { 0.0, 0.0, 1.0, 1};
-    GLfloat diffuse_coeffs_Wall_D[] = { 0.5, 0.5, 1, 1};
-    GLfloat specular_coeffs_Wall_D[] = { 0, 0, 0, 1};
+    glDisable(GL_LIGHTING);
+    //ovo je zid napravljen od Sfere koju sece clipping ravan
+    double clip_plane1_D[] = {0, -1, 0, 30};
+    
+    glClipPlane(GL_CLIP_PLANE3, clip_plane1_D);
+    glEnable(GL_CLIP_PLANE3);
+    glColor3f(0.5, 0.5, 0.5);
+    
+    glutSolidSphere(105, 20, 20);  
 
-    glMaterialfv(GL_BACK, GL_AMBIENT, ambient_coeffs_Wall_D);
-    glMaterialfv(GL_BACK, GL_DIFFUSE, diffuse_coeffs_Wall_D);
-    glMaterialfv(GL_BACK, GL_SPECULAR, specular_coeffs_Wall_D);
-
+    glDisable(GL_CLIP_PLANE3);
        
-    glBindTexture(GL_TEXTURE_2D, names[0]);
-      
-    draw_wall();
 
-    /* Iskljucujemo aktivnu teksturu */
-    glBindTexture(GL_TEXTURE_2D, 0);
+   glEnable(GL_LIGHTING);
+ 
 
     glPopMatrix();
 
@@ -455,125 +470,4 @@ void on_display(void){
 
      glutSwapBuffers();
 
-}
-
-static void draw_wall(void)
-{
-	 glBegin(GL_QUADS);
-        
-
-        glNormal3f(1, 0, 0);
-
-         glTexCoord2f(0, 0);
-         glVertex3f(-100, -1, -50);
-
-         glTexCoord2f(10, 0);
-         glVertex3f(-100, -1, 50);
-
-         glTexCoord2f(10, 4);
-         glVertex3f(-100, 30, 50);
-
-         glTexCoord2f(0, 4);
-         glVertex3f(-100, 30, -50);
-
-        glNormal3f(1, 0, -1);
-
-         glTexCoord2f(0, 0);
-         glVertex3f(-100, -1, 50);
-
-         glTexCoord2f(10, 0);
-         glVertex3f(-50, -1, 100);
-
-         glTexCoord2f(10, 4);
-         glVertex3f(-50, 30, 100);
-
-         glTexCoord2f(0, 4);
-         glVertex3f(-100, 30, 50);
-
-        glNormal3f(0, 0, -1);
-
-         glTexCoord2f(0, 0);
-         glVertex3f(50, -1, 100);
-
-         glTexCoord2f(10, 0);
-         glVertex3f(-50, -1, 100);
-
-         glTexCoord2f(10, 4);
-         glVertex3f(-50, 30, 100);
-
-         glTexCoord2f(0, 4);
-         glVertex3f(50, 30, 100);
-
-       glNormal3f(1, 0, 1);
-
-         glTexCoord2f(0, 0);
-         glVertex3f(-100, -1, -50);
-
-         glTexCoord2f(10, 0);
-         glVertex3f(-50, -1, -100);
-
-         glTexCoord2f(10, 4);
-         glVertex3f(-50, 30, -100);
-
-         glTexCoord2f(0, 4);
-         glVertex3f(-100, 30, -50);
-
-       glNormal3f(-1, 0, 0);
-
-         glTexCoord2f(0, 0);
-         glVertex3f(100, -1, -50);
-
-         glTexCoord2f(10, 0);
-         glVertex3f(100, -1, 50);
-
-         glTexCoord2f(10, 4);
-         glVertex3f(100, 30, 50);
-
-         glTexCoord2f(0, 4);
-         glVertex3f(100, 30, -50);
-
-       //krivi 
-       glNormal3f(-1, 0, 1);
-
-         glTexCoord2f(0, 0);
-         glVertex3f(100, -1, -50);
-
-         glTexCoord2f(10, 0);
-         glVertex3f(50, -1, -100);
-
-         glTexCoord2f(10, 4);
-         glVertex3f(50, 30, -100);
-
-         glTexCoord2f(0, 4);
-         glVertex3f(100, 30, -50);
-
-        glNormal3f(0, 0, 1);
-
-         glTexCoord2f(0, 0);
-         glVertex3f(-50, -1, -100);
-
-         glTexCoord2f(10, 0);
-         glVertex3f(50, -1, -100);
-
-         glTexCoord2f(10, 4);
-         glVertex3f(50, 30, -100);
-
-         glTexCoord2f(0, 4);
-         glVertex3f(-50, 30, -100);
-
-           //krivi 
-       glNormal3f(-1, 0, -1);
-
-         glTexCoord2f(0, 0);
-         glVertex3f(100, -1, 50);
-
-         glTexCoord2f(10, 0);
-         glVertex3f(50, -1, 100);
-
-         glTexCoord2f(10, 4);
-         glVertex3f(50, 30, 100);
-
-         glTexCoord2f(0, 4);
-         glVertex3f(100, 30, 50);
-    glEnd();
 }

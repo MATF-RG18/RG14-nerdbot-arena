@@ -10,12 +10,15 @@
 
 //razni indikatori za razlicita stanja sfera, iteracije itd... 
 static int AnuBullet1 = 0,AnuBullet2 = 0,AnuBullet3 = 0, br_iter = 0, AnuExplosion1 = 0,AnuExplosion2 = 0,AnuExplosion3 = 0;
-static int NotFired1 = 1, NotFired2 = 1, NotFired3 = 1, TIME_INT = 20, SF_HITind=0;
+static int NotFired1 = 1, NotFired2 = 1, NotFired3 = 1, TIME_INT = 20, SF_HITind = 0;
+static int laserIter = 0, LS_Hitind = 0;
 
 
 
 void draw_anunaki(void){
 
+
+	if(laserTime == 0 || AnuShoot == 1){
 	//ako nije ispaljena vrti je po njenoj osi normalno
 	if(NotFired1 == 1)
 	{
@@ -121,6 +124,85 @@ void draw_anunaki(void){
     	glutSolidSphere(0.5,20,20);
     	glPopMatrix();
     }
+	}
+	//animacija lasera 
+	else if(laserTime == 1 && AnuShoot == 0)
+	{	
+
+		//laserov sistem(par sfera neke linije i jedna ravan) prvo rotiramo oko Z ose da bi laser isao od dole na gore
+		glPushMatrix();
+
+		 glTranslatef(0, 4, 0);
+		
+		 glRotatef(laserIter*2-45,  0, 0, 1);
+
+		//ravan koju laser napravi malo isecena da ne bi izgledalo ko da Anunaki ubija samog sebe
+		glDisable(GL_LIGHTING);
+		double clip_plane1_4[] = {1, 1, 0, -1};
+    
+   	 	glClipPlane(GL_CLIP_PLANE4, clip_plane1_4);
+   	 	glEnable(GL_CLIP_PLANE4);
+		glPushMatrix();
+			glColor3f(0.2, 0, 0.2);
+
+		  	glTranslatef(50, -100, 0);
+		  	glScalef(100, 200, 0.1);
+		  	glutSolidCube(1);
+
+		glPopMatrix();
+
+		glDisable(GL_CLIP_PLANE4);
+		glEnable(GL_LIGHTING);
+
+		glTranslatef(0, -4, 0);
+
+		glTranslatef(0, 4, 0);
+		//posle laserov sistem rotiramo oko X ose da bi izgledalo kul
+		glRotatef(laserIter*10, 1, 0, 0);
+		glTranslatef(0, -4, 0);
+
+		//zraci energije 
+		glDisable(GL_LIGHTING);
+		glColor3f(0.2, 0, 0.2);
+		glLineWidth(2);
+		glBegin(GL_LINES);
+			glVertex3f(0, 5, 0);
+			glVertex3f(1, 4, 0);
+
+			glVertex3f(0, 3, +1);
+			glVertex3f(1, 4, 0);
+
+
+			glVertex3f(0, 3, -1);
+			glVertex3f(1, 4, 0);
+
+		glEnd();
+		glLineWidth(1);
+		glEnable(GL_LIGHTING);
+
+		//Anunakijeve standardne tri sfere
+		glPushMatrix();
+
+		glTranslatef(0, 5, 0);
+	
+		glutSolidSphere(0.4,20,20);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 3, 1);
+		
+		glutSolidSphere(0.4,20,20);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 3, -1);
+
+		glutSolidSphere(0.4,20,20);
+		glPopMatrix();
+
+		glPopMatrix();
+
+	}
 
     
   
@@ -197,20 +279,20 @@ void on_timer_EL(int value){
 			{
 				SF_HITind = 1;
 				HB3_HP -=1;
-				printf("da li sam usao ovde %d %d\n", br_iter, HB3_HP);
+				printf("EXPLOSION NOISES\n");
 			}
 			//sve je isto kao za prvu koliziju samo je Z kordinata pomerena zato sto ova sfera pada pravo i gleda se u drugom trenutku
 			if(X + 25 >= XA - 25 - AnuBullet2 + 128 && X + 25 <= XA - 25 + AnuBullet2  && Z >= ZA - AnuBullet2 + 64 && Z  <= ZA + AnuBullet2 - 64 && br_iter >= 99 && br_iter <= 115)
 			{
 				SF_HITind = 1;
 				HB3_HP -=1;
-				printf("da li sam usao ovde %d %d\n", br_iter, HB3_HP);
+				printf("EXPLOSION NOISES\n");
 			}
 			if(X + 25 >= XA - 25 - AnuBullet3 + 128 && X + 25 <= XA - 25 + AnuBullet3  && Z >= ZA - 17 - AnuBullet3 + 64 && Z  <= ZA - 17 + AnuBullet3 - 64 && br_iter >= 134 && br_iter <= 150)
 			{
 				SF_HITind = 1;
 				HB3_HP -=1;
-				printf("da li sam usao ovde %d %d\n", br_iter, HB3_HP);
+				printf("EXPLOSION NOISES\n");
 			}
 			}	
 
@@ -234,7 +316,48 @@ void on_timer_EL(int value){
 			br_iter = 0;
 			SF_HITind = 0;
 		}
+
+
 	}
+
+	//aktiviran je laser
+	if(laserTime == 1)
+		{
+			//ne mrdaj dok se ispaljuje laser, recikliram movement blocker iz AnuShoot
+			AnuShootMV = 1;
+
+			//ako je ukljucena animacija AnuShoot iskljuci laser i move blockera
+			if(AnuShoot == 1)
+			{
+				laserTime = 0;
+				laserIter -= 2;
+				AnuShootMV = 0;
+			}
+
+			//uvecava se parametar animacije
+			laserIter += 2;
+
+			//kolizija za HB3 i zrak lasera, da li im se poklapaju koordinate po Z i da li je HB3 ispred Anunakija po X-osi 
+			if(Z <= ZA + 2 && Z >= ZA - 2 && X + 25 >= XA -25 && laserIter >= 6)
+			{
+				if(LS_Hitind == 0)
+				{
+					LS_Hitind = 1;
+					HB3_HP -= 1;
+				printf("LASER NOISES\n");
+				}
+			}
+
+			//resetovanje svega
+			if(laserIter == 80)
+			{
+				laserTime = 0;
+				laserIter = 0;
+				el_rotate = 0;
+				AnuShootMV = 0;
+				LS_Hitind = 0;
+			}
+		}
 
 	glutPostRedisplay();
 	glutTimerFunc(TIME_INT,on_timer_EL,0);

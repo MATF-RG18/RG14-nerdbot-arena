@@ -12,8 +12,6 @@
 #include "collision.h"
 #include "image.h"
 
-
-
 //razmere prozora
 int window_width, window_height;
 
@@ -28,10 +26,10 @@ int Teleporting=0, Jump=0, Zoom=0, trail_ID=1, HB3_HP = 10;
 float TeleClp = 1;
 //The Hammer Is Bangin'
 float HammerTime=45, HammerThrow=0, HammerSpin=0, HammerLift=0, HammerMeme=0;
-int HammerUp=1, HTGO=0, HTB=0, HITind = 1;
+int HammerUp=1, HTGO=0, HTB=0, HITind1 = 1,HITind2 = 1, Tenken = 0;
 
 //promenljive za pomeranje Anunakija i za njegove sposobnosti
-int XA=0, ZA=0, mvXA=0, mvZA=0, Amv=0, MIter=0, setMirrors=0, el_rotate=0, mirror_image=0, AnuShoot=0, Anu_HP = 10, AnuShootMV = 0;
+int XA=0, ZA=0, mvXA=0, mvZA=0, Amv=0, MIter=0, setMirrors=0, el_rotate=0, mirror_image=0, AnuShoot=0, Anu_HP = 10, AnuShootMV = 0, laserTime = 0;
 
 //deklaracija callback funkcija
 static void on_reshape(int width, int height);
@@ -59,7 +57,7 @@ int main(int argc, char** argv){
     glutDisplayFunc(on_display);
     glutKeyboardFunc(on_keyboard);
     glutReshapeFunc(on_reshape);
-    glutTimerFunc(20, on_timer, 0);
+    glutTimerFunc(30, on_timer, 0);
     glutTimerFunc(50,on_timer_EL,0);
     glutKeyboardUpFunc(keyUp);
 
@@ -79,7 +77,7 @@ int main(int argc, char** argv){
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
     //da lepo odrazava svetlost i unutar objekata
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
+   // glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
 
     //tekstura ucitana iz fajla
    // Image * image;
@@ -103,7 +101,7 @@ void keyUp (unsigned char key, int x, int y) {
     
 //desava se klikom na neko dugme na tastaturi
 static void on_keyboard(unsigned char key, int x, int y){
-    //collision(1);
+    collision(1);
     keyStates[(int)key] = 1;
 
     if( mirror_image == 1 && ((int)key == 'o' || (int)key == 'O'))
@@ -115,7 +113,10 @@ static void on_keyboard(unsigned char key, int x, int y){
            exit(0);
            break;
         case 32:{
+            if(HammerTime == 45){
             HammerUp=0;
+            Tenken = 1;
+            }
             break;
             }
         case 'a':
@@ -128,26 +129,24 @@ static void on_keyboard(unsigned char key, int x, int y){
 
             if(bot_rotation < 90 && bot_rotation >= -90){
                 rot = 5;
-                mvX = 0;
-                mvZ = 0;
+                HB3mv = 0;
             }
             else if(bot_rotation < -90 && bot_rotation >-180){
                 rot = -5;
-                mvX = 0;
-                mvZ = 0;
+                HB3mv = 0;
             }
             else if(bot_rotation <= 180 && bot_rotation > 90)
             {
                 rot = -5;
-                mvX = 0;
-                mvZ = 0;  
+                HB3mv = 0; 
             }
-            else if(bot_rotation == 90){
-                rot = 0;
-                mvX = 0;
-                mvZ = 1;
-                collision(1);
+            else if(bot_rotation == 90)
+            {
+                rot = 0;               
             }
+            mvX = 0;
+            mvZ = 1;
+            collision(1);
             break;
         }
         case 'd':
@@ -160,27 +159,25 @@ static void on_keyboard(unsigned char key, int x, int y){
 
             if(bot_rotation <= 90 && bot_rotation > -90){
                 rot = -5;
-                mvX = 0;
-                mvZ = 0;
+                HB3mv = 0;
             }
             else if(bot_rotation < -90 && bot_rotation >= -180)
             {
                 rot = 5;
-                mvX = 0;
-                mvZ = 0;  
+                HB3mv = 0; 
             }
             else if(bot_rotation > 90 && bot_rotation < 180)
             {
                 rot = 5;
-                mvX = 0;
-                mvZ = 0;  
+                HB3mv = 0;
             }
-            else if(bot_rotation == -90){
+            else if(bot_rotation == -90)
+            {
                 rot = 0;
-                mvX = 0;
-                mvZ = -1;
-                collision(1);
             }
+            mvX = 0;
+            mvZ = -1;
+            collision(1);
             break;
         }
         case 'w':
@@ -191,21 +188,20 @@ static void on_keyboard(unsigned char key, int x, int y){
             if(bot_rotation <= 180 && bot_rotation > 0)
             {
                 rot = -5;
-                mvX = 0;
-                mvZ = 0;
+                HB3mv = 0;
             }
             else if(bot_rotation >= -180 && bot_rotation < 0)
             {
                 rot = 5;
-                mvX = 0;
-                mvZ = 0;
+                HB3mv = 0;
             }
-            else if(bot_rotation == 0){
+            else if(bot_rotation == 0)
+            {
                 rot = 0;
-                mvX = -1;
-                mvZ = 0;
-                collision(1);
             }
+            mvX = -1;
+            mvZ = 0;
+            collision(1);
             break;
         }
         case 's':
@@ -214,21 +210,20 @@ static void on_keyboard(unsigned char key, int x, int y){
             rotate = 1;
             if(bot_rotation >= 0 && bot_rotation < 180){
                 rot = 5;
-                mvX = 0;
-                mvZ = 0;
+                HB3mv = 0;
             }
             else if(bot_rotation < 0 && bot_rotation > -180)
             {
                 rot = -5;
-                mvX = 0;
-                mvZ = 0; 
+                HB3mv = 0;
             }
             else if(bot_rotation == 180 || bot_rotation == -180){
                 rot = 0;
-                mvX = 1;
-                mvZ = 0;
-                collision(1);
+                
             }
+            mvX = 1;
+            mvZ = 0;
+            collision(1);
             break;
         }
         //bacanje cekica na f
@@ -297,9 +292,14 @@ static void on_keyboard(unsigned char key, int x, int y){
             AnuShootMV = 1;
         	break;
         }    
+        case 'u':
+        case 'U':
+        {
 
+            laserTime = 1;
+            break;
+        }
     }
-    //collision(1);
 }       
 			
 //desava se kad se prozoru promeni razmera

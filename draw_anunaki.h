@@ -1,7 +1,7 @@
 #ifndef _DRAW___ANUNAKI_H_
 #define _DRAW___ANUNAKI_H_
 
-extern int el_rotate, AnuShoot;
+extern int el_rotate, AnuShoot, laserTime;
 extern int keyStates[256];
 extern int HB3_HP, XA, ZA, X, Z, mvZA, mvXA, AnuShootMV;
 

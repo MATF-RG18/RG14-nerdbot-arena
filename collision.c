@@ -37,9 +37,10 @@ int collision(int IND){
 
 	//colizija sa zidom arene
 
-	//za HB3
+	//za HB3 gledam arenu kao da je krug sa poluprecnikom 95, i bacujem koordinate HB3 u jednacinu tog kruga da ocenim da li je u unutrasnjosti
 	if(HB3Xmax*HB3Xmax + HB3Zmax*HB3Zmax - 8400 >=0)
 	{
+		printf("It seems something is in your way!?\n");
 		if(HB3Xmax>=0 && HB3Zmax>=0){
 	 		X -= 1;
 	 		Z -= 1;
@@ -64,6 +65,7 @@ int collision(int IND){
 	//za Anunakija
 	if(AXmax*AXmax + AZmax*AZmax - 8400 >=0)
 	{
+		printf("Try flying over that.\n");
 		if(AXmax>=0 && AZmax>=0){
 	 		XA -= 1;
 	 		ZA -= 1;
@@ -87,16 +89,36 @@ int collision(int IND){
 	}
 
 
-	//gledam gde se po X koordinati nalzi HB3
-	// i na tu koordinatu dodajem pola hammerThrow(ne znam zasto tako najpribliznije radi :D) i gledam da li se poklopi za X koordianatam Anunakija
-	if((X + 25 + (int)HammerThrow/2 >= AXmin && X + 25 +(int)HammerThrow/2 <= AXmax)  && (AZmin <= Z &&  Z <= AZmax))
+	//gledam gde se po X/Z koordinati nalzi HB3 i na tu koordinatu dodajem 1/3 HammerThrow(ispred translate-a sam primenio scale(0.3, 0.3, 0.3))
+	//pomnozenu sa cos/sin ugla rotacije sto pravi krugove oko HB3 koji predstavljaju sve moguca mesta udarca u anunakija
+	// i onda gledam da li se poklopi za bounding boxom Anunakija
+	if((X + 25 + (int)(HammerThrow/3*cos(-bot_rotation*3.14/180)) >= AXmin && X + 25 + (int)(HammerThrow/3*cos(-bot_rotation*3.14/180)) <= AXmax) 
+	 && (AZmin <= Z + (int)(HammerThrow/3*sin(-bot_rotation*3.14/180)) &&  Z + (int)(HammerThrow/3*sin(-bot_rotation*3.14/180)) <= AZmax))
 	{
 		//smanjuje se HP anunakiju ako ga strefi cekic
-		if(HITind == 1)
+		if(HITind1 == 1)
 		{
+		HITind1 = 0;
 		Anu_HP -= 1;
-		HITind = 0;
+		printf("Anu: I can't believe you have done this...\n");
 		}
+	}
+
+
+	//sudar Velikog cekica i Anunakija slicno kao za HammerThrow samo sad imam fiksan poluprecnik kruznice (50 - duzina cekica) 
+	//proveravam gde je anunaki u odnosu na bounding box glave cekica
+	if(HammerTime >= 85 && HammerTime <= 90 &&
+		( XA - 25 <= (X + 30 - 50*cos(-bot_rotation*3.14/180)) && (XA - 25 >= (X + 15 - 50*cos(-bot_rotation*3.14/180))) )
+		&&  ( ZA <= (Z + 20 - 50*sin(-bot_rotation*3.14/180)) && ZA >= (Z - 50*sin(-bot_rotation*3.14/180)) ) )
+	{
+		//da bi se samo jednom skinuo HP Anunakiju
+		if(HITind2 == 1)
+		{
+		HITind2 = 0;
+		Anu_HP -= 1;
+		printf("HB3: KOKUJO TENKEN MJOO!\nAnu: oh noOoOo..\n");
+		}
+		
 	}
 
 
