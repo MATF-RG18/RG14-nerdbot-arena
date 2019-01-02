@@ -49,9 +49,9 @@ int main(int argc, char** argv){
 
 
     //inicijalizacija prozora
-    glutInitWindowPosition(100,100);
-    glutInitWindowSize(400,400);
-    glutCreateWindow("CRINGE-BOT-ARENA");
+    glutInitWindowPosition(300,100);
+    glutInitWindowSize(800,600);
+    glutCreateWindow("Nerdbot Arena");
 
     //pozivanje callback funkcija
     glutDisplayFunc(on_display);
@@ -76,12 +76,6 @@ int main(int argc, char** argv){
 
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-    //da lepo odrazava svetlost i unutar objekata
-   // glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
-
-    //tekstura ucitana iz fajla
-   // Image * image;
-
     //malo udebljavamo crtanje linija
     glLineWidth(1);
 
@@ -102,31 +96,35 @@ void keyUp (unsigned char key, int x, int y) {
 //desava se klikom na neko dugme na tastaturi
 static void on_keyboard(unsigned char key, int x, int y){
     collision(1);
+    //azuriramo globalni niz u kom pratimo koji su tasteri pritisnuti
     keyStates[(int)key] = 1;
 
-    if( mirror_image == 1 && ((int)key == 'o' || (int)key == 'O'))
-    {	
-    	return;
- 	}
-    switch(key){
+    switch(key)
+    {
         case 27:
            exit(0);
            break;
-        case 32:{
-            if(HammerTime == 45){
-            HammerUp=0;
+        //Tenken sposobnost
+        case 32:
+        {
+            if(HammerTime == 45)
+            {
+            HammerUp = 0;
             Tenken = 1;
             }
             break;
             }
+        //pomeranje HB3 komentari za A se odnose i na W S D
         case 'a':
         case 'A':
         {
           
+            //pre pomeranja se sredjuje rotacija ako bot_rotation nije na 90 azuriraj parametar rot
             rotate = 1;
             if(bot_rotation == -180)
             	bot_rotation = 180;
 
+            //u zavisnosti od trenutne vrednosti bot_rotation biramo na koju stranu rotiramo da bi uvek isao najkracim putem, dok se rotira ne pomera se 
             if(bot_rotation < 90 && bot_rotation >= -90){
                 rot = 5;
                 HB3mv = 0;
@@ -144,6 +142,7 @@ static void on_keyboard(unsigned char key, int x, int y){
             {
                 rot = 0;               
             }
+            //parametri kretanja koji se dodaju na X i Z koordinatu HB3
             mvX = 0;
             mvZ = 1;
             collision(1);
@@ -242,9 +241,11 @@ static void on_keyboard(unsigned char key, int x, int y){
             Teleporting = 1;
             break;
         }
+        //kretanje Anunakija
         case 'i':
         case 'I':
         {
+            //parametri kretanja koji se dodaju na X i Z koordinatu Anunakija
             Amv = 1;
             collision(2);
             mvXA = 1;
@@ -278,20 +279,27 @@ static void on_keyboard(unsigned char key, int x, int y){
             mvZA = 1;
             break;
         }
+        //Mirror image sposobnost
         case 'o':
         case 'O':
         {
+            if(mirror_image == 1)
+            {
+                break;
+            }
         	mirror_image = 1;
         	setMirrors = 1;
         	break;
         }
+        //bacanje sfera
         case 'p':
         case 'P':
         {
         	AnuShoot = 1;
             AnuShootMV = 1;
         	break;
-        }    
+        }  
+        //LASER  
         case 'u':
         case 'U':
         {

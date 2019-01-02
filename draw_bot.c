@@ -9,6 +9,7 @@
 
 void draw_bot(void){
 
+    //gomila poligona koji predstavljaju telo od HB3
     glBegin(GL_POLYGON);
         glNormal3f(-1,1,0);
         glVertex3f(0,0,0);                        
@@ -81,12 +82,16 @@ void draw_bot(void){
     //THE HAMMER (two cubes and a sphere walk into a coordinate system...)
     glPushMatrix();
 
+    //razne transformacije u odnosu za animacije
     glScalef(0.3,0.3,0.3);
-    glTranslatef(1.5+HammerThrow, 1+HammerLift, 1.75);
-    glRotatef(HammerTime+HammerSpin,0,0,1); 
-    glTranslatef(0,HammerMeme,0);   
+    glTranslatef(1.5 + HammerThrow, 1 + HammerLift, 1.75);
+    glRotatef(HammerTime + HammerSpin, 0, 0, 1); 
+    glTranslatef(0, HammerMeme, 0); 
+
+    //the pommel  
     glutSolidSphere(1,20,20);
 
+    //the handle
     glPushMatrix();
 
     glTranslatef(0,3.5,0);
@@ -95,6 +100,7 @@ void draw_bot(void){
 
     glPopMatrix();
 
+    //The hammer head
     glPushMatrix();
 
     glTranslatef(0,7,0);

@@ -145,8 +145,8 @@ void draw_anunaki(void){
 		glPushMatrix();
 			glColor3f(0.2, 0, 0.2);
 
-		  	glTranslatef(50, -100, 0);
-		  	glScalef(100, 200, 0.1);
+		  	glTranslatef(100, -100, 0);
+		  	glScalef(200, 200, 0.1);
 		  	glutSolidCube(1);
 
 		glPopMatrix();

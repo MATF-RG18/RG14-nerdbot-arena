@@ -1,3 +1,4 @@
+//ako se dva objekata sudare prijavi i obradi taj sudar
 #include<stdio.h>
 #include<stdlib.h>
 #include<GL/gl.h>
@@ -108,7 +109,7 @@ int collision(int IND){
 	//sudar Velikog cekica i Anunakija slicno kao za HammerThrow samo sad imam fiksan poluprecnik kruznice (50 - duzina cekica) 
 	//proveravam gde je anunaki u odnosu na bounding box glave cekica
 	if(HammerTime >= 85 && HammerTime <= 90 &&
-		( XA - 25 <= (X + 30 - 50*cos(-bot_rotation*3.14/180)) && (XA - 25 >= (X + 15 - 50*cos(-bot_rotation*3.14/180))) )
+		( XA - 25 <= (X + 38 - 50*cos(-bot_rotation*3.14/180)) && (XA - 25 >= (X + 12 - 50*cos(-bot_rotation*3.14/180))) )
 		&&  ( ZA <= (Z + 20 - 50*sin(-bot_rotation*3.14/180)) && ZA >= (Z - 50*sin(-bot_rotation*3.14/180)) ) )
 	{
 		//da bi se samo jednom skinuo HP Anunakiju

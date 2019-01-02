@@ -14,15 +14,18 @@ int Hammer_Pause = 0;
 void on_timer(int value)
 {
 
+	//sposobnot umozavanja
 	if(mirror_image)
 	{
 		
-		if(MIter <= 200)
+		if(MIter <= 300)
 		{
+			//counter koji ogranicava iscrtavanje
 			MIter += 1;
 		}
 		else
 		{
+			//kada prodje dovoljno vremena resetuj sve
 			MIter = 0;
 			mirror_image = 0;	
     	}   
@@ -84,20 +87,25 @@ void on_timer(int value)
        }
     }
 
-    //udaranje cekica o pod 
+    //Tenken sposobnost
     if(HammerUp==0)
         {
+        //spustanje cekica
         if(HammerTime < 90)
             {
                 HammerTime += 3;
+                rot = 0;
                 glutPostRedisplay();
             }
+        //mala pauza kad lupi o zemlju
         else if(HammerTime == 90)
         	{
             Hammer_Pause += 1;
+            rot = 0;
         	}
         }
-    if(Hammer_Pause == 12)
+        //ka istekne pauza dizemo cekic, Veliki cekic sad nestane
+    	if(Hammer_Pause == 12)
         {
         	Hammer_Pause = 0;
         	HammerUp = 1; 
@@ -109,21 +117,22 @@ void on_timer(int value)
                 HammerTime -= 1;
                 glutPostRedisplay();
             }
+        //kad se vrati u pocetni polozaj prekini sa animacijom
      	else if(HammerTime == 45)
      	{
      		Hammer_Pause = 0;
      		HITind2 = 1;
     	 }
 
-    if(rotate == 1){
-    	   if(bot_rotation > 180)
+    	//rotacija za HB3
+    	if(rotate == 1){
+    	 //regulisanje uglova rotacije da ne bi otisao preko 180 ili -180
+		if(bot_rotation > 180)
             bot_rotation = 180;
         if(bot_rotation < -180)
             bot_rotation = -180;
 
-        //bot_rotation += rot;
-
-
+        //dok nisi pod odgovarajucim uglom rotiraj se
         if(bot_rotation!=90 && (keyStates[(int)'a'] || keyStates[(int)'A']))
         {
             bot_rotation += rot;
@@ -140,6 +149,7 @@ void on_timer(int value)
         {
             bot_rotation += rot;
         }
+        //ako jesi pod pravim uglom kraj rotacije, HB3 moze da se krece
         else {
         	rotate = 0;
         	HB3mv = 1;
@@ -147,18 +157,20 @@ void on_timer(int value)
         	
     }
 
-    //pomeranje Hammer-Bot-3000 na WASD
-    if(((keyStates[(int)'w'] || keyStates[(int)'W']) || (keyStates[(int)'a'] || keyStates[(int)'A']) || (keyStates[(int)'s'] || keyStates[(int)'S']) || (keyStates[(int)'d'] || keyStates[(int)'D'])) && HB3mv == 1)
+    //pomeranje Hammer-Bot-3000 na W A S D
+    if(((keyStates[(int)'w'] || keyStates[(int)'W']) || (keyStates[(int)'a'] || keyStates[(int)'A'])
+     || (keyStates[(int)'s'] || keyStates[(int)'S']) || (keyStates[(int)'d'] || keyStates[(int)'D'])) && HB3mv == 1)
     {     
             X += mvX;
             Z += mvZ;
             glutPostRedisplay();
     }
 
-    //kretanje za Anunaki na IJKL
-        if((keyStates[(int)'k'] || keyStates[(int)'K']) || (keyStates[(int)'l'] || keyStates[(int)'L']) || (keyStates[(int)'i'] || keyStates[(int)'I']) || (keyStates[(int)'j'] || keyStates[(int)'J']))
+    //kretanje za Anunaki na I J K L
+    if((keyStates[(int)'k'] || keyStates[(int)'K']) || (keyStates[(int)'l'] || keyStates[(int)'L'])
+     || (keyStates[(int)'i'] || keyStates[(int)'I']) || (keyStates[(int)'j'] || keyStates[(int)'J']))
     {
-  			//dok se ne zavrsi poslednja eksplozija Anunaki ne moze da se pomera
+  			//dok se ne zavrsi poslednja eksplozija Anunaki ne moze da se pomera, takodje dok puca laser
     		if(AnuShootMV == 1)
     		{
     			mvZA = 0;
@@ -171,14 +183,18 @@ void on_timer(int value)
 
 
 
-//Moc teleportovanja
+//Sposobnost Teleportovanja
 if(Teleporting == 1){
+			//pre skoka
             if(Jump == 0){
-            if(TeleClp <- 7){                
+            //Parametar d za clipping ravan TeleClp iscrtava sferu od dole na gore
+            if(TeleClp <- 7){ 
+            		//u zavisnosti od rotacije HB3 scrtava se jedan od tragova               
                     if(bot_rotation==0)
                     {
                     trail_ID = 1;
                     X -= 30;
+                    //ako je doslo do kolizije sa zidom pri teleportovanju sve vrati na pocetne vrednosti i prekini teleportovanje
                     if(collision(1))
 					{
 						X += 30;
@@ -223,25 +239,30 @@ if(Teleporting == 1){
                     	Jump -= 1;
 					} 
                     }
+                    //ako se nalazis pod bilo kojim drugim uglom rotacije prekini teleportovanje
                     else 
                     {
                     	Teleporting = 0;
                     	TeleClp = 1;
                     	Jump -= 1;
                     }
+                    //skocili smo
                     Jump +=1;
                     glutPostRedisplay();
             
             }
             else
             {
+
+           	//azuriranje parametra animacije
             TeleClp-=0.5;
 
             glutPostRedisplay();
             }
-        }
-        
-         if(Jump == 1){
+        } 
+        //kada skocimo iscrtaj sferu od gore na dole
+        if(Jump == 1){
+        	//kada je kraj animacije postavi sve vrednosti na pocetne
             if(TeleClp>1)
             {
                 Zoom = 0;
@@ -251,6 +272,7 @@ if(Teleporting == 1){
                 Jump = 0;
                 glutPostRedisplay();
             }
+            //azuriraj paramertar animacije
             else{
             TeleClp+=0.5;
 

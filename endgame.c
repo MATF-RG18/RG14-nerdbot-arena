@@ -1,3 +1,4 @@
+//scena za kraj igre ovo je kao neki best off projekta, svaki deo je prekopiran od negde
 #include<stdio.h>
 #include<stdlib.h>
 #include<GL/gl.h>
@@ -30,8 +31,8 @@ void endgame(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity(); 
-  	gluLookAt(15, 15, 15,
-  			   0, 0, 0,
+  	gluLookAt(15, 15, 12,
+  			   0, 2, 2,
   			   0, 1, 0);
 
   	//pod arene
@@ -57,38 +58,23 @@ void endgame(void)
     /* Iskljucujemo aktivnu teksturu */
     glBindTexture(GL_TEXTURE_2D, 0);
 
- 	//zid arene
-    glDisable(GL_LIGHTING);
-    //ovo je zid napravljen od Sfere koju sece clipping ravan
-    double clip_plane1_D[] = {0, -1, 0, 30};
-    
-    glClipPlane(GL_CLIP_PLANE3, clip_plane1_D);
-    glEnable(GL_CLIP_PLANE3);
-    glColor3f(0.5, 0.5, 0.5);
-    
-    glutSolidSphere(105, 20, 20);  
 
-    glDisable(GL_CLIP_PLANE3);
-       
+    //materijali robota
+    GLfloat ambient_coeffs[] = { 0.1, 0.1, 0.1, 1 };
+    GLfloat diffuse_coeffs[] = { 0.5, 0, 0, 1 };
+    GLfloat specular_coeffs[] = { 0.5, 0.5, 0.5, 1};
+    GLfloat shininess = 10;
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
+    glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 
-    glEnable(GL_LIGHTING);
-
+    //ako je Anunaki izgubio crtaj ovu scenu
   	if(Anu_HP <= 0){
-
-
-    //materijali
-    GLfloat ambient_coeffs_Cube[] = { 1, 0.3, 1, 1};
-    GLfloat diffuse_coeffs_Cube[] = { 0.7, 0.7, 0.7, 1};
-    GLfloat specular_coeffs_Cube[] = { 0.5, 0.5, 0.5, 1};
-    GLfloat shininess_Cube = 10;
-    glMaterialfv(GL_BACK, GL_AMBIENT, ambient_coeffs_Cube);
-    glMaterialfv(GL_BACK, GL_DIFFUSE, diffuse_coeffs_Cube);
-    glMaterialfv(GL_BACK, GL_SPECULAR, specular_coeffs_Cube);
-    glMaterialf(GL_FRONT, GL_SHININESS, shininess_Cube);
-
 
     if(HammerTime == 45 && HammerThrow == 0)
     {
+
     //cekici iza HB3
    	glPushMatrix();
 
@@ -97,7 +83,8 @@ void endgame(void)
    	glTranslatef(-5, 5, -5);
 
     glPushMatrix();
-    //the Hammer
+
+    //the Hammer 1
     glTranslatef(0, 0, -5);
     glRotatef(45, 1, 0, 0);
     glRotatef(90, 0, 1, 0);
@@ -121,9 +108,9 @@ void endgame(void)
 
     glPopMatrix();
 
-    //the Hammer
+    //the Hammer 2
     glPushMatrix();
-    //glTranslatef(0, 0, +2);
+
     glRotatef(-45, 1, 0, 0);
  	glRotatef(90, 0, 1, 0);
     glutSolidSphere(1,20,20);
@@ -173,6 +160,14 @@ void endgame(void)
   	glPopMatrix();
 
 
+
+   	//postavljanje boje za Anunakija
+    diffuse_coeffs[0] = 0.2;
+    diffuse_coeffs[1] = 0.3;
+    diffuse_coeffs[2] = 0.5;
+
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+
   	//gubitnik
   	glPushMatrix();
 
@@ -201,7 +196,6 @@ void endgame(void)
   	glPopMatrix();
 
   	//anunaki
-
   	double clip_plane1_5[] = {-1, 0, 0, 1.5};
     
    	glClipPlane(GL_CLIP_PLANE5, clip_plane1_5);
@@ -240,31 +234,9 @@ void endgame(void)
 
     glPopMatrix();
   }
+  //ako je HB3 izgubio crtaj ovu scenu
   else if(HB3_HP <= 0)
   {
-
-
-
-	//pijedastal
-    glPushMatrix();
-  	glTranslatef(5, 0, -5);
-
-  	glPushMatrix();
-  	glScalef(2, 5, 2);
-  	glutSolidCube(2);
-
-  	glPopMatrix();
-
-  	//Anunaki
-  	glPushMatrix();
-  		glTranslatef(0, 9, 0);
-
-  		draw_anunaki();
-
-    glPopMatrix();
-
-
-  	glPopMatrix();
 
   	//gubitnik
 	glPushMatrix();
@@ -338,7 +310,56 @@ void endgame(void)
     glPopMatrix();
 
 
+ 	//postavljanje boje za Anunakija
+    diffuse_coeffs[0] = 0.2;
+    diffuse_coeffs[1] = 0.3;
+    diffuse_coeffs[2] = 0.5;
+
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+
+	//pijedastal
+    glPushMatrix();
+  	glTranslatef(5, 0, -5);
+
+  	glPushMatrix();
+  	glScalef(2, 5, 2);
+  	glutSolidCube(2);
+
+  	glPopMatrix();
+
+  	//Anunaki
+  	glPushMatrix();
+  		glTranslatef(0, 9, 0);
+
+  		draw_anunaki();
+
+    glPopMatrix();
+
+
+  	glPopMatrix();
 
   }
+
+    //matrijali zida
+    ambient_coeffs[0] = 0.7;
+    ambient_coeffs[1] = 0.7;
+    ambient_coeffs[2] = 0.7;
+
+    diffuse_coeffs[0] = 0.7;
+    diffuse_coeffs[1] = 0.7;
+    diffuse_coeffs[2] = 0.7;
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+    
+    //ovo je zid napravljen od Sfere koju sece clipping ravan
+    double clip_plane_3[] = {0, -1, 0, 30};
+    
+    glClipPlane(GL_CLIP_PLANE3, clip_plane_3);
+    glEnable(GL_CLIP_PLANE3);
+
+    glutSolidSphere(105, 20, 20);  
+
+    glDisable(GL_CLIP_PLANE3);
 
 }
